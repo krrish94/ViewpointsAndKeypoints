@@ -1,0 +1,1 @@
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/falak/DeepLearning/ViewpointsAndKeypoins/external/caffe/src/caffe/proto:/home/falak/DeepLearning/ViewpointsAndKeypoins/external/caffe/install/lib:/home/falak/DeepLearning/ViewpointsAndKeypoins/external/caffe/src/caffe:/usr/local/cuda-7.5/targets/x86_64-linux/lib
