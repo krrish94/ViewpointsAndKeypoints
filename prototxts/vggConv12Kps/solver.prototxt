@@ -1,0 +1,14 @@
+net: "/home/harit/ViewpointsAndKeypoints-master/prototxts/vggConv12Kps/trainTest.prototxt"
+test_iter: 100
+test_interval: 1000
+base_lr: 0.00001
+lr_policy: "step"
+gamma: 0.1
+stepsize: 20000
+display: 200
+max_iter: 20000
+momentum: 0.90
+weight_decay: 0.0005
+snapshot: 5000
+snapshot_prefix: "/home/harit/ViewpointsAndKeypoints-master/snapshots/vpsKps/vggConv12Kps_cup"
+solver_mode: GPU

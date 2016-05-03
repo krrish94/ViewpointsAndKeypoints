@@ -1,0 +1,7 @@
+prototxts/VGG_ILSVRC_16_layers.caffemodel
+snapshots/
+cachedir/
+data/
+external/
+prediction_ready.mat
+temp.mat
