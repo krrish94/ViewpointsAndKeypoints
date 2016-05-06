@@ -64,7 +64,7 @@ websiteDir = fullfile(cachedir,'visualization'); %directory where visualizations
 prototxtDir = fullfile(basedir,'prototxts');
 
 %%
-folders = {'analysisVp','analysisKp','detectionPose','pose','encoding','predict','evaluate','utils','visualization','evaluation','learning','preprocess','rcnnKp','rcnnVp','cnnFeatures'};
+folders = {'analysisVp','analysisKp','detectionPose','pose','encoding','predict','evaluate','utils','visualization','evaluation','learning','preprocess','rcnnKp','rcnnVp','cnnFeatures', 'experiments_km'};
 for i=1:length(folders)
     addpath(genpath(folders{i}));
 end

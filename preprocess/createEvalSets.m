@@ -26,7 +26,7 @@ elseif strcmp(params.vpsDataset, 'pascal')
     feat = var.feat;
     % Load rotation data for the corresponding class
     var = load(fullfile(rotationPascalDataDir,class));
-    rotData = var.rotationData;   
+    rotData = var.rotationData;
 end
 
 
@@ -93,6 +93,16 @@ end
 % Training Set
 
 if strcmp(params.vpsDataset, 'imagenet')
+    % Create a list of all images for which rotation data is available
+    
+    % Get names of files for which annotations can be used
+    goodIndNames = {};
+    for i = 1:length(goodInds)
+        goodIndNames{i} = rotData(i).voc_image_id;
+    end
+    % Split them into train and test sets
+    
+    
     inds = ismember(voc_ids,sets.fnamesTrain);
 elseif strcmp(params.vpsDataset, 'pascal')
     % Get indices that are part of trainIds
