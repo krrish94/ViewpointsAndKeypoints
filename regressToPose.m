@@ -26,10 +26,16 @@ switch params.optMethod
         % Number of hypothesis to consider (usually 1, maximum of 8
         % hypotheses supported currently)
         nHypotheses = params.nHypotheses;
-        % Predict pose on test set
-        [testPreds] = poseHypotheses(testFeats,nHypotheses,alphaOpt);
-        % Predict pose on train set
-        [trainPreds] = poseHypotheses(trainFeats,nHypotheses,alphaOpt);
+        
+        if strcmp(params.features, 'vggAzimuthVps')
+            testPreds = km_poseHypotheses(testFeats, nHypotheses, alphaOpt);
+            trainPreds = km_poseHypotheses(trainFeats, nHypotheses, alphaOpt);
+        else
+            % Predict pose on test set
+            [testPreds] = poseHypotheses(testFeats,nHypotheses,alphaOpt);
+            % Predict pose on train set
+            [trainPreds] = poseHypotheses(trainFeats,nHypotheses,alphaOpt); 
+        end
 end
 
 % Evaluate test predictions and compute test error

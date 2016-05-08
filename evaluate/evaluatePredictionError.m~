@@ -31,7 +31,7 @@ for h=1:length(rotsPred)
         % to a matrix (3 x 3), for the prediction and the ground truth.
         rotPred = reshape(rotsPred{h}(i,:),3,3);
         rotGt = reshape(rotsGt(i,:),3,3);
-        % Take the Frobenius norm to be the error
+        % 
         err = norm(logm(rotGt*rotPred'), 'fro');
         if(err < errors(i))
             errors(i)=err;

@@ -1,64 +1,98 @@
 function [preds,subtype] = km_poseHypotheses(feat,n,alpha)
-%POSEHYPOTHESES Summary of this function goes here
-%   Detailed explanation goes here
+% Given an output feature vector (84 dimensional) from the vggJointVps net,
+% compute Euler angles representing the pose
 
+% Declare global variables
 globals;
-N = size(feat,1);N1 = 21;N2 = 21;N3 = 21;
+
+% Dimensionality of feat
+N = size(feat,1);
+
+% Dimensionality of feats 1, 2, and 3
+N1 = 24;
+N2 = 16;
+N3 = 8;
+
+% Check if number of hypotheses is less than 8
 assert(n<=8,'A maximum of 8 hypothesis supported currently');
+
+% Scale of features (default is 1). Doesn't seem to affect predictions.
 featScale = 1;
 
+% Indices corresponding to feat1, feat2, feat3, feat1_coarse, feat2_coarse,
+% feat3_coarse. Refer to prototxt files of vggJointVps for clarification.
 indices{1} = 1:24;
 indices{2} = 25:40;
 indices{3} = 41:48;
 indices{4} = 49:52;
 indices{5} = 53:54;
 indices{6} = 55:56;
-indices{7} = 43:46; %skipping one index because subtypes started from 1 instead of 0 during training
+indices{7} = 43:46; % Of no use here, as no sub-types involved
 
 
-%% Coarse and Fine feature channels
-feat1 = 1./(1+exp(-feat(:,indices{1})));feat1 = bsxfun(@rdivide,feat1,sum(feat1,2));
-feat2 = 1./(1+exp(-feat(:,indices{2})));feat2 = bsxfun(@rdivide,feat2,sum(feat2,2));
-feat3 = 1./(1+exp(-feat(:,indices{3})));feat3 = bsxfun(@rdivide,feat3,sum(feat3,2));
+% Splitting feat into coarse and fine feature channels and normalizing them
+% using the sigmoid function
 
+% Fine features
+feat1 = 1./(1+exp(-feat(:,indices{1})));
+feat1 = bsxfun(@rdivide,feat1,sum(feat1,2));
+
+feat2 = 1./(1+exp(-feat(:,indices{2})));
+feat2 = bsxfun(@rdivide,feat2,sum(feat2,2));
+
+feat3 = 1./(1+exp(-feat(:,indices{3})));
+feat3 = bsxfun(@rdivide,feat3,sum(feat3,2));
+
+
+% Coarse features
 repInds = ceil(indices{1}/6);
 feat1c = 1./(1+exp(-featScale*feat(:,indices{4})));
-% feat1c = feat1c(:,repInds);
+feat1c = feat1c(:,repInds);
 feat1c = bsxfun(@rdivide,feat1c,sum(feat1c,2));
 
-repInds = ceil(indices{2}/6);
+repInds = ceil(indices{2}/32);
 feat2c = 1./(1+exp(-featScale*feat(:,indices{5})));
-% feat2c = feat2c(:,repInds);
+feat2c = feat2c(:,repInds);
 feat2c = bsxfun(@rdivide,feat2c,sum(feat2c,2));
 
-repInds = ceil(indices{3}/6);
+repInds = ceil(indices{3}/44);
 feat3c = 1./(1+exp(-featScale*feat(:,indices{6})));
-% feat3c = feat3c(:,repInds);
+feat3c = feat3c(:,repInds);
 feat3c = bsxfun(@rdivide,feat3c,sum(feat3c,2));
 
+% Comes into play only if subtypes are involved
 if(size(feat,2) >= max(indices{7}))
     [~,subtype] = max(feat(:,indices{7}),[],2);
 else
     subtype = zeros(N,1);
 end
 
-%% Combining Coarse and Fine Features
-feat1 = (1-alpha)*feat1; %+ alpha*feat1c;
-feat2 = (1-alpha)*feat2; %+ alpha*feat2c;
-feat3 = (1-alpha)*feat3; %+ alpha*feat3c;
+% Combine coarse and fine features, using alpha as the weight for the
+% coarse features
+feat1 = (1-alpha)*feat1 + alpha*feat1c;
+feat2 = (1-alpha)*feat2 + alpha*feat2c;
+feat3 = (1-alpha)*feat3 + alpha*feat3c;
 
-%% n-best
+% Get the best dimensions of feat1, feat2, and feat3
 [I1s,I2s,I3s,selections1,selections2,selections3] = nBestF3(feat1,feat2,feat3,n);
 
-%% Cands
+% For each candidate, i.e., for each hypothesis
 for cand = 1:n
+    % Get a linear indexing for I1s, I2s, and I3s
     I1 = I1s(sub2ind([N,size(I1s,2)],[1:N]',selections1(:,cand)));
     I2 = I2s(sub2ind([N,size(I2s,2)],[1:N]',selections2(:,cand)));
     I3 = I3s(sub2ind([N,size(I3s,2)],[1:N]',selections3(:,cand)));
-    preds{cand} = encodePose([(I1 - 11)*pi/10.5,(I2 - 11)*pi/10.5, (I3-0.5)*pi/10.5],params.angleEncoding);
+    % Obtain pose predictions
+    % preds{cand} = encodePose([(I1 - 11)*pi/10.5,(I2 - 11)*pi/10.5, (I3-0.5)*pi/10.5],params.angleEncoding);
+    % KM's version
+    disp('here');
+    preds{cand} = encodePose([(I1 - 7)*pi/7,(I2 - 7)*pi/7, (I3-0.5)*pi/7],params.angleEncoding);
 end
 
 end
+
+
+
 
 function [I1s,I2s,I3s,selections1,selections2,selections3] = nBestAll(feat1,feat2,feat3,n)
 N = size(feat1,1);
@@ -94,42 +128,70 @@ I3s = [I31,I32];
 
 end
 
+
+
+
 function [I1s,I2s,I3s,selections1,selections2,selections3] = nBestF3(feat1,feat2,feat3,n)
 
+% Number of samples
 N = size(feat1,1);
+% Dimensionality of feature
 N3 = size(feat3,2);
 
+% Get the indices of the maxima of feat1 and feat2, for each test feature
 [~,I11] = max(feat1,[],2);
 [~,I21] = max(feat2,[],2);
 
+% Initialize a vector whose dimensionality is same as that of feat3
 locMax = false(size(feat3));
+% For each dimension of feat3, verify if it is a local maximum, i.e., if it
+% has a higher than the bins preceeding or succeeding it (wrapping around)
 for j=1:N3
     locMax(:,j) = feat3(:,j) >= feat3(:,mod(j-2,N3)+1) & feat3(:,j) >= feat3(:,mod(j,N3)+1);
 end
+% If not a local maximum, set all those indices to -Inf
 feat3(~locMax)=-Inf;
 
+% Create three arrays to indicate selected feature dimensions. Here, 'n'
+% denotes the number of hypotheses we want to select per feature. The array
+% stores the index of the dimension of feat3 which is selected.
 selections1 = ones(N,n);
 selections2 = ones(N,n);
 selections3 = ones(N,n);
+
+% Not used in the current edition of the code
 simDiffs = normpdf([-10:10],0,1.5)/normpdf(0,0,1.5);
 
+% For each sample
 for i=1:N
+    % Get feat3 of the sample
     f = feat3(i,:);
+    
+    % Commented by Tulsiani
     %for j=1:n
     %    [~,k] = max(f);
     %    selections3(i,j) = k;
     %    diffk = 1-circshift(simDiffs,[0,k-11]);
     %    f = f.*diffk;
     %end
+    % End of 'Commented by Tulsiani'
+    
+    % Sort the dimensions of feat3 (for the current sample) in descending
+    % order. Select the first n hypotheses (usually n = 1) corresponding to
+    % the highest local maximas of feat3.
     [~,orders] = sort(f,'descend');
     selections3(i,:) = orders(1:n);
 end
+
 
 I1s = [I11];
 I2s = [I21];
 I3s = ones(N,1)*[1:N3];
 
 end
+
+
+
 
 function [I1s,I2s,I3s,selections1,selections2,selections3] = nBestF3Modes(feat1,feat2,feat3,n)
 

@@ -7,7 +7,11 @@ globals;
 
 % Dimensionality of feat
 N = size(feat,1);
-N1 = 21;N2 = 21;N3 = 21;
+
+% Dimensionalities of feats 1, 2, and 3
+N1 = 21;
+N2 = 21;
+N3 = 21;
 
 % Check if number of hypotheses is less than 8
 assert(n<=8,'A maximum of 8 hypothesis supported currently');
