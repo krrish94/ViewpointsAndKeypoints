@@ -1,0 +1,13 @@
+function [featureVec] = runNetOnce(dataStruct, rcnn_model)
+
+% Runs a forward pass of the (deployment) net and returns the computed
+% feature vector
+
+
+% Make sure that caffe has been initialized for this model
+if rcnn_model.cnn.init_key ~= caffe('get_init_key')
+  error('You probably need to call rcnn_load_model');
+end
+
+
+end
