@@ -1,6 +1,9 @@
-function pose = getPoseFromFeat(feat)
+function yaw = getPoseFromFeat(feat)
 % GETPOSEFROMFEAT  Obtains an angle prediction, given a feature vector
 
+
+% Declaring global variables
+globals;
 
 % Indices corresponding to feat1, feat2, feat3, feat1_coarse, feat2_coarse,
 % feat3_coarse. Refer to prototxt files of vggJointVps for clarification.
@@ -104,19 +107,32 @@ selections3(:) = orders(1:n);
 I1s = [I11];
 % Index of the max of feat2
 I2s = [I21];
+% Indices (currently in ascending order) ranging from 1 to N3
 I3s = ones(N,1)*[1:N3];
     
 % Get a linear indexing for I1s, I2s, and I3s
 % I1 = I1s(sub2ind([N,size(I1s,2)],[1:N]',selections1(:,n)));
 % I2 = I2s(sub2ind([N,size(I2s,2)],[1:N]',selections2(:,n)));
-I3 = I3s(sub2ind([N,size(I3s,2)],[1:N]',selections3(:,n)));
+% I3 = I3s(sub2ind([N,size(I3s,2)],[1:N]',selections3(:,n)));
 
 I1 = I1s;
 I2 = I2s;
+I3 = selections3;
 
 % Obtain pose predictions
 preds{n} = encodePose([(I1 - 11)*pi/10.5,(I2 - 11)*pi/10.5, (I3-0.5)*pi/10.5],params.angleEncoding);
-preds
+pose = preds{1};
+
+% Get the Euler angle representation of the prediction
+eulerPred = decodePose(pose, params.angleEncoding);
+% Get the equivalent rotation matrix representation
+rotPred = encodePose(eulerPred, 'rot');
+% Reshape the above 9 x 1 vector to a 3 x 3 matrix
+rotPred = reshape(rotPred, 3, 3);
+
+% Recover the angle
+yaw = norm(logm(rotPred), 'fro');
+yaw = yaw/sqrt(2)*180/pi;
 
 
 end

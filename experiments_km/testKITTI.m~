@@ -38,17 +38,17 @@
 
 kittiDir = fullfile(basedir, 'data', 'KITTI');
 seqName = 'Seq00';
-imgName = '000006.png';
+imgName = '000001.png';
 
 img = imread(fullfile(kittiDir, seqName, imgName));
 % For image 0
-% bbox = single([295, 165, 454, 290]);
+bbox = single([295, 165, 454, 290]);
+% For image 1
 
 
-imshow(img);
+imtool(img);
 r = imrect;
 position = wait(r);
-bbox = single([position(1), position(2), position(1)+position(3), position(2)+position(4)]);
 % imshow(img);
 % hold on;
 % rectangle('Position', [295, 165, (454-295), (290-165)]);
