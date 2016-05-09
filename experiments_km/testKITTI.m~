@@ -2,8 +2,7 @@
 % We're intereseted only in the 'car' class
 class = 'car';
 
-% Turn off Matlab warnings
-warning('off', 'all');
+% Turn off M
 
 % Declare global variables
 globals;
@@ -64,7 +63,7 @@ for i = 1:length(imageList)
     % Get pose from the feature vector
     yaw = getPoseFromFeat(featVec);
     % Display the prediction
-    disp(yaw);
+    disp('yaw');
     % Store the prediction
     yawPreds(i) = yaw;
     
