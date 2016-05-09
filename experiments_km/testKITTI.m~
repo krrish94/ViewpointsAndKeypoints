@@ -55,10 +55,7 @@ dataStruct.labels = single(pascalClassIndex(class));
 % Run the network on one image
 featVec = runNetOnce(cnn_model, dataStruct);
 
-
-%% Get pose from the feature vector
-
-
+% Get the 
 
 
 
