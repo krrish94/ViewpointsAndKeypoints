@@ -15,17 +15,17 @@ globals;
 addpath /home/falak/DeepLearning/ViewpointsAndKeypoints/data/KITTI/devkit_tracking/matlab/
 
 % Whether or not to write output to a video file
-writeVideoOutput = false;
+writeVideoOutput = true;
 
 
 %% Parameters for KITTI (test data)
 
 % ID of the sequence to be processed
-sequenceNum = 2;
+sequenceNum = 4;
 % ID of the first image to process (in the sequence specified)
 startImageId = 0;
 % ID of the last image to process (in the sequence specified)
-endImageId = 200;
+endImageId = 20;
 % ID of the car to track
 carId = 0;
 % Mode ('manual', or 'auto'). Specifies if the user will input the bounding
@@ -85,7 +85,7 @@ for i = 1:length(imageList)
         imshow(img);
         hold on;
         % Plot title
-        text(size(img,2)/2,3,sprintf('Viewpoint Demo'),'color','g','HorizontalAlignment','center','VerticalAlignment','top','FontSize',14,'FontWeight','bold','BackgroundColor','black');
+        text(size(img,2)/2,3,sprintf('2D Bounding Boxes'),'color','g','HorizontalAlignment','center','VerticalAlignment','top','FontSize',14,'FontWeight','bold','BackgroundColor','black');
         % Legend
         text(0,00,'Not occluded','color','g','HorizontalAlignment','left','VerticalAlignment','top','FontSize',14,'FontWeight','bold','BackgroundColor','black');
         text(0,30,'Partly occluded','color','y','HorizontalAlignment','left','VerticalAlignment','top','FontSize',14,'FontWeight','bold','BackgroundColor','black');
@@ -141,10 +141,6 @@ for i = 1:length(imageList)
             
         end
         
-        if writeVideoOutput
-            print(fig, sprintf('vp_results/seq%02d_%03d_%03d/%03d.jpg', sequenceNum, startImageId, endImageId, imageList(i)));
-        end
-        
         hold off;
         pause(0.01);
     end
@@ -156,6 +152,10 @@ for i = 1:length(imageList)
 %     % Store the prediction
 %     yawPreds(i) = yaw;
     
+end
+
+if writeVideoOutput
+    close(v);
 end
 
 
