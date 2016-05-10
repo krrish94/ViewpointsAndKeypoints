@@ -21,7 +21,7 @@ writeVideoOutput = true;
 %% Parameters for KITTI (test data)
 
 % ID of the sequence to be processed
-sequenceNum = 4;
+sequenceNum = ;
 
 % Mode ('manual', or 'auto'). Specifies if the user will input the bounding
 % box or if they have to be picked up from the ground truth.
