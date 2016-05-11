@@ -21,7 +21,7 @@ writeVideoOutput = false;
 %% Parameters for KITTI (test data)
 
 % ID of the sequence to be processed
-sequenceNum = 4;
+sequenceNum = 2;
 
 % Mode ('manual', or 'auto'). Specifies if the user will input the bounding
 % box or if they have to be picked up from the ground truth.
@@ -41,14 +41,14 @@ kittiCalibDir = fullfile(kittiBaseDir, 'calib');
 numFrames = length(dir(fullfile(kittiImageDir)))-2;
 
 % ID of the first image to process (in the sequence specified)
-startImageId = 0;
+startImageId = 60;
 % ID of the last image to process (in the sequence specified)
-% endImageId = 200;
-endImageId = numFrames-1;
+endImageId = 120;
+% endImageId = numFrames-1;
 % Creating a list of images to process
 imageList = startImageId:endImageId;
 % ID(s) of the car to track
-carIds = [9];
+carIds = [];
 
 % % Create an array to store the predictions
 % yawPreds = zeros(size(imageList));
@@ -113,7 +113,7 @@ for i = 1:length(imageList)
         for j = 1:length(tracklet)
             % Current tracklet (annotation corresponding to a detection)
             curTracklet = tracklet(j);
-            if ~strcmp(curTracklet.type, 'Car') && ~strcmp(curTracklet.type, 'Van') %|| ~ismember(curTracklet.id,carIds)
+            if ~strcmp(curTracklet.type, 'Car') && ~strcmp(curTracklet.type, 'Van') || ~ismember(curTracklet.id,carIds)
                 continue
             end
             
@@ -139,27 +139,9 @@ for i = 1:length(imageList)
             % Get pose from the feature vector
             % yaw = getPoseFromFeat(featVec);
             yaw = getPoseFromFeat_test(featVec);
-            % Get ground truth yaw
-            yaw_true = curTracklet.ry*180/pi;
             
             % Draw the label above the object
-            
-            % label_text = sprintf('(%02d) %3.2f %3.2f', curTracklet.id, yaw, yaw_true);
-            
-            % Coarse label text
-            if (yaw >= 18 && yaw <= 21) || (yaw >= 1 && yaw <= 3)
-                label_text = 'front';
-            elseif (yaw >=4 && yaw <= 9)
-                label_text = 'left';
-            elseif (yaw >= 10 && yaw <= 12)
-                label_text = 'rear';
-            elseif(yaw >= 13 && yaw <= 17)
-                label_text = 'right';
-            else
-                label_text = 'other';
-            end
-            
-            % label_text = sprintf('%3.2f', yaw);
+            label_text = sprintf('(%02d) %3.2f', curTracklet.id, yaw);
             x = (curTracklet.x1 + curTracklet.x2)/2;
             y = curTracklet.y1;
             text(x, max(y-5,40), label_text, 'color', occlusionColors{occluded+1}, 'BackgroundColor', 'k', ...
