@@ -1,16 +1,28 @@
-clear;
-startup;
+%% Performs Keypoint Localization (Assumes bboxes are provided)
+
+% clear;
+% startup;
+
+% Declaring global varaibles
 globals;
+% Loading the train/test split for Pascal
 load(fullfile(cachedir,'pascalTrainValIds'));
 
-perf = zeros(20,5);
+% Matrix to hold performance parameters for each of the 20 classes
+% perf = zeros(20,5);
+% But, we're here interested only in the 'car' class
+perf = zeros(1,5);
 
-%for c = 1     
+% For each class
 for c = params.classInds
+    % Get the class label and display it
     class = pascalIndexClass(c);
     disp(class)
+    % Dimensions of the heatmap
     params.heatMapDims = [24 24];
+    % Network for detecting keypoints
     params.kpsNet = 'vgg';
+    
     loadFeatRigid;
     [priorFeat] = posePrior(dataStruct,class,trainIds);
     

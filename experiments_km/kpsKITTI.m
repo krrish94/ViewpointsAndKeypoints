@@ -15,17 +15,24 @@ globals;
 addpath /home/km/ViewpointsAndKeypoints/data/KITTI/devkit_tracking/matlab/
 
 % Whether or not to write output to a video file
-writeVideoOutput = false;
+writeVideoOutput = true;
 
 % Whether to show coarse (left, right, front, rear) or fine (angle in
 % degrees) labels over the selected bounding boxes
 showCoarseLabels = true;
 
 
+%% Initialize the Neural Nets once
+
+% cnn_model = initNeuralNet('vggJointVps', 'vggJointVps_iter_70000', 224);
+
+% cnn_model_kps = initNeuralNet('vggConv6Kps', 'vggConv6Kps', 192);
+
+
 %% Parameters for KITTI (test data)
 
 % ID of the sequence to be processed
-sequenceNum = 4;
+sequenceNum = 3;
 
 % Mode ('manual', or 'auto'). Specifies if the user will input the bounding
 % box or if they have to be picked up from the ground truth.
@@ -45,9 +52,9 @@ kittiCalibDir = fullfile(kittiBaseDir, 'calib');
 numFrames = length(dir(fullfile(kittiImageDir)))-2;
 
 % ID of the first image to process (in the sequence specified)
-startImageId = 0;
+startImageId = 1;
 % ID of the last image to process (in the sequence specified)
-endImageId = 0;
+endImageId = 2;
 % endImageId = numFrames-1;
 % Creating a list of images to process
 imageList = startImageId:endImageId;
@@ -71,15 +78,15 @@ img = imread(imgFile);
 
 % Create a folder to store the output images
 if writeVideoOutput
-    mkdir(sprintf('vp_results/seq%02d_%03d_%03d', sequenceNum, startImageId, endImageId));
+    mkdir(sprintf('kp_results/seq%02d_%03d_%03d', sequenceNum, startImageId, endImageId));
     set(fig, 'PaperPositionMode', 'auto');
 end
 
 % Predict pose for each image
-for i = 1:length(imageList)
+for idx = 1:length(imageList)
     
     % Generate the file path for the current image to be processed
-    imgFile = fullfile(kittiImageDir, sprintf('%06d.png',imageList(i)));
+    imgFile = fullfile(kittiImageDir, sprintf('%06d.png',imageList(idx)));
     % Load the image
     img = imread(imgFile);
     
@@ -96,7 +103,8 @@ for i = 1:length(imageList)
         imshow(img);
         hold on;
         % Plot title
-        text(size(img,2)/2,3,sprintf('Viewpoint Demo'),'color','g','HorizontalAlignment','center','VerticalAlignment','top','FontSize',14,'FontWeight','bold','BackgroundColor','black');
+        % text(size(img,2)/2,3,sprintf('Viewpoint Demo'),'color','g','HorizontalAlignment','center','VerticalAlignment','top','FontSize',14,'FontWeight','bold','BackgroundColor','black');
+        text(size(img,2)/2,3,sprintf('Keypoint Demo'),'color','g','HorizontalAlignment','center','VerticalAlignment','top','FontSize',14,'FontWeight','bold','BackgroundColor','black');
         % Legend
         text(0,00,'Not occluded','color','g','HorizontalAlignment','left','VerticalAlignment','top','FontSize',14,'FontWeight','bold','BackgroundColor','black');
         text(0,30,'Partly occluded','color','y','HorizontalAlignment','left','VerticalAlignment','top','FontSize',14,'FontWeight','bold','BackgroundColor','black');
@@ -105,14 +113,14 @@ for i = 1:length(imageList)
         text(0,120,'Don''t care region','color','c','HorizontalAlignment','left','VerticalAlignment','top','FontSize',14,'FontWeight','bold','BackgroundColor','black');
         
         % Frame number
-        text(size(img,2),0,sprintf('Sequence %d frame %d (%d/%d)', sequenceNum, imageList(i), i, length(imageList)),'color','g','HorizontalAlignment','right','VerticalAlignment','top','FontSize',14,'FontWeight','bold','BackgroundColor','black');
+        text(size(img,2),0,sprintf('Sequence %d frame %d (%d/%d)', sequenceNum, imageList(idx), idx, length(imageList)),'color','g','HorizontalAlignment','right','VerticalAlignment','top','FontSize',14,'FontWeight','bold','BackgroundColor','black');
         
         % Specifying colors for occlusion levels
         occlusionColors = {'g', 'y', 'r', 'w', 'c'};
         
         % Tracklet for the current frame (usually comprises of multiple
         % annotations, again referred to as tracklets)
-        tracklet = tracklets{imageList(i)+1};
+        tracklet = tracklets{imageList(idx)+1};
         
         for j = 1:length(tracklet)
             % Current tracklet (annotation corresponding to a detection)
@@ -132,12 +140,18 @@ for i = 1:length(imageList)
             % Draw the rectangle
             rectangle('Position', bboxPos, 'EdgeColor', occlusionColors{occluded+1}, 'LineWidth', 3);
             
+            % If the current object is occluded or truncated, don't process
+            if occluded > 0 || truncated > 0
+                continue
+            end
+            
             % Create the data structure for the current detection
             dataStruct.bbox = bbox;
             dataStruct.fileName = imgFile;
             dataStruct.labels = single(pascalClassIndex(class));
             
             % Run the network on the detection (tracklet)
+            initViewpointNet;
             featVec = runNetOnce(cnn_model, dataStruct);
             
             % Get pose from the feature vector
@@ -145,6 +159,44 @@ for i = 1:length(imageList)
             yaw = getPoseFromFeat_test(featVec);
             % Get ground truth yaw
             yaw_true = curTracklet.ry*180/pi;
+            
+            disp('Loading conv6');
+            initKeypointNet;
+            featVec_6Kps = runNetOnce(cnn_model_conv6Kps, dataStruct);
+            featVec_temp = featVec_6Kps(1945:2448);
+            feat = flipFeatVecXY(featVec_temp, [6,6]);
+            feat6 = resizeHeatMapSingle(feat, [6 6], params.heatMapDims);
+            featConv6 = 1./(1+exp(-feat6));
+            
+            disp('Loading conv12');
+            initCoarseKeypointNet;
+            featVec_12Kps = runNetOnce(cnn_model_conv12Kps, dataStruct);
+            featVec_temp = featVec_12Kps(7777:9792);
+            feat = flipFeatVecXY(featVec_temp, [12 12]);
+            feat12 = resizeHeatMapSingle(featVec_temp, [12 12], params.heatMapDims);
+            featConv12 = 1./(1+exp(-feat12));
+            
+            disp('Computing pose prior features');
+            posePriorFeat = computePosePriors(dataStruct, featVec);
+            % featPose = resizeHeatMapSingle(posePriorFeat, [12, 12], params.heatMapDims);
+            
+            % testFeat = featConv6 + featConv12;
+            testFeat = 1./(1+exp(-feat6-feat12-posePriorFeat));
+            
+            disp('Predicting keypoints');
+            [kpCoords,scores] = maxLocationPredict(featConv6, bbox, params.heatMapDims);
+            scatter(kpCoords(1,:),kpCoords(2,:),50,'r','filled');
+            
+%             % Run the keypoint network on the detection (tracklet)
+%             featVec_kps = runNetOnce(cnn_model_conv6Kps, dataStruct);
+%             featVec_temp = featVec_kps(1945:2448);
+%             % disp('Loading conv6');
+%             feat = flipFeatVecXY(featVec_temp, [6,6]);
+%             feat6 = resizeHeatMapSingle(feat, [6 6], params.heatMapDims);
+%             featConv6 = 1./(1+exp(-feat6));
+%             [kpCoords,scores] = maxLocationPredict(featConv6, bbox, params.heatMapDims);
+%             kpCoords = kpCoords(1:2,1:14);
+%             scatter(kpCoords(1,:),kpCoords(2,:),50,'r','filled');
             
             % Draw the label above the object
             
@@ -176,91 +228,18 @@ for i = 1:length(imageList)
         end
         
         if writeVideoOutput
+            % Somehow doesn't work
             % saveas(fig, sprintf('vp_results/seq%02d_%03d_%03d/%03d.jpg', sequenceNum, startImageId, endImageId, imageList(i)));
-            print(sprintf('vp_results/seq%02d_%03d_%03d/%03d.png', sequenceNum, startImageId, endImageId, imageList(i)), '-dpng', '-r0');
+            
+            % Works
+            % print(sprintf('vp_results/seq%02d_%03d_%03d/%03d.png', sequenceNum, startImageId, endImageId, imageList(i)), '-dpng', '-r0');
+            print(sprintf('kp_results/seq%02d_%03d_%03d/%03d.png', sequenceNum, startImageId, endImageId, imageList(idx)), '-dpng', '-r0');
         end
         
         hold off;
         pause(0.1);
     end
     
-%     % Get pose from the feature vector
-%     yaw = getPoseFromFeat(featVec);
-%     % Display the prediction
-%     disp(yaw);
-%     % Store the prediction
-%     yawPreds(i) = yaw;
-    
 end
-
-
-
-
-
-
-
-
-
-% seqName = 'Seq00';
-% imgName = '000006.png';
-% 
-% img = imread(fullfile(kittiBaseDir, seqName, imgName));
-% % For image 0
-% % bbox = single([295, 165, 454, 290]);
-% 
-% 
-% imshow(img);
-% r = imrect;
-% position = wait(r);
-% bbox = single([position(1), position(2), position(1)+position(3), position(2)+position(4)]);
-% % imshow(img);
-% % hold on;
-% % rectangle('Position', [295, 165, (454-295), (290-165)]);
-% 
-% % Create a data structure to hold relevant parameters
-% dataStruct.bbox = bbox;
-% dataStruct.fileName = fullfile(kittiBaseDir, seqName, imgName);
-% dataStruct.labels = single(pascalClassIndex(class));
-% 
-% % Run the network on one image
-% featVec = runNetOnce(cnn_model, dataStruct);
-
-
-%% Get pose from the feature vector
-
-% yaw = getPoseFromFeat(featVec);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
 

@@ -2,8 +2,10 @@ function [] = rcnnKpsDataCollect()
 %RCNNDATA Summary of this function goes here
 %   Detailed explanation goes here
 
-%% Initialize
+% Declare global variables
 globals;
+
+% Folder containing RCNN detections
 rcnnDataDir = rcnnKpsPascalDataDir;
 
 mkdir(rcnnDataDir);

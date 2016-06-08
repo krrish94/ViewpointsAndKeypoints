@@ -5,11 +5,11 @@ function [mapsNeighbors] = neighborMapsKpsScore(R,bbox,trainData)
 warning off;
 %% Getting kpMaps
 globals;
-params = params;
 
 H = params.heatMapDims(2);
 W = params.heatMapDims(1);
 Kp = size(trainData(1).kps,1);
+Kp = 14;
 
 wBox = bbox(3)-bbox(1);hBox = bbox(4)-bbox(2);
 bboxRatio = (wBox)/(hBox);

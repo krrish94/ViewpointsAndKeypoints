@@ -1,6 +1,9 @@
 function generateKeypointPoseFeatures(proto,suffix,inputSize,classInd,mirror)
 
+% Declaring global variables
 globals;
+
+
 protoFile = fullfile(prototxtDir,proto,'deploy.prototxt');
 binFile = fullfile(snapshotsDir,'finalSnapshots',[suffix '.caffemodel']);
 
