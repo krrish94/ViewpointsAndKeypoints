@@ -23,7 +23,10 @@ for c = params.classInds
     % Network for detecting keypoints
     params.kpsNet = 'vgg';
     
+    % Loads conv6 and conv12 features
     loadFeatRigid;
+    
+    % Load pose priors
     [priorFeat] = posePrior(dataStruct,class,trainIds);
     
     %% feat

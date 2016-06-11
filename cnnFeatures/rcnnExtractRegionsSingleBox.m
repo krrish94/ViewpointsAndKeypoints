@@ -8,6 +8,9 @@ if(nargin<4)
     padRatio = 0;
 end
 
+% If the dataset isn't specified, assume it to be Pascal
+imagesDir = pascalImagesDir;
+
 % Set the directory containing images, depending on the dataset used
 if strcmp(params.vpsDataset, 'imagenet')
     imagesDir = imagenetImagesDir;

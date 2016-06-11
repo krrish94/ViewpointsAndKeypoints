@@ -1,20 +1,35 @@
 function [] = mainKpsPredict()
 
-%% create dataStructs for test
+%% Create dataStructs for test
+
+% For each class that we're testing for
 for c = params.classInds
+    % Display class index
     disp(c);
+    % Get the class label fromt the index
     class = pascalIndexClass(c);
+    % Read keypoint data for the corresponding class
     readKpsData(class);
 end
     
-%% compute predictions for objects with known ground-truth box
-extractRigidKeypointFeatures(params.classInds,192,'vggConv6Kps','vggConv6Kps',15);
-extractRigidKeypointFeatures(params.classInds,384,'vggConv12Kps','vggConv12Kps',15);
-generateKeypointPoseFeatures('vggJointVps','vggJointVps',224,params.classInds,1); % needed for posePrior
+%% Compute predictions for objects with known ground-truth box (Localization setting)
 
-%% compute predictions for R-CNN detections - we assume pose for detections is precomputed by running the commented line below
-% generateDetectionPoseFeatures(params.classInds,'vggJointVps','vggJointVps',224,1); % (uncomment this if not already computed for viewpoint prediction  
-generateDetectionKpsFeatures(params.classInds,'vggConv6Kps','vggConv6Kps',192,15);
-generateDetectionKpsFeatures(params.classInds,'vggConv12Kps','vggConv12Kps',384,15);
+% Extract 'conv6' features using the fine-grained network
+extractRigidKeypointFeatures(params.classInds,192,'vggConv6Kps','vggConv6Kps',15);
+% Extract 'conv12' features using the coarse network
+extractRigidKeypointFeatures(params.classInds,384,'vggConv12Kps','vggConv12Kps',15);
+% Extract viewpoint estimates using the viewpoint network (used as a pose
+% prior on keypoint locations)
+generateKeypointPoseFeatures('vggJointVps','vggJointVps',224,params.classInds,1);
+
+
+%% Compute predictions for R-CNN detections (Detection setting) 
+
+% We assume pose for detections is precomputed. It not already computed,
+% run 'vggJointVps' for viewpoint prediction.
+
+% generateDetectionPoseFeatures(params.classInds,'vggJointVps','vggJointVps',224,1);  
+% generateDetectionKpsFeatures(params.classInds,'vggConv6Kps','vggConv6Kps',192,15);
+% generateDetectionKpsFeatures(params.classInds,'vggConv12Kps','vggConv12Kps',384,15);
     
 end

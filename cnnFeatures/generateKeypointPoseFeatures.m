@@ -1,4 +1,7 @@
-function generateKeypointPoseFeatures(proto,suffix,inputSize,classInd,mirror)
+function generateKeypointPoseFeatures(proto, suffix, inputSize, classInd, mirror)
+% GENERATEKEYPOINTPOSEFEATURES  Extracts pose features used as priors for
+% keypoint prediction.
+
 
 % Declaring global variables
 globals;

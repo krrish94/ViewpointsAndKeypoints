@@ -14,7 +14,7 @@ featConv12 = 1./(1+exp(-feat12));
 
 % Load pose priors
 % [priorFeat] = posePrior(dataStruct,class,fnamesTrain);
-priorFeat = posePrior(dataStruct, class, trainIds);
+priorFeat = posePrior(dataStruct, class, trainIds)
 
 % Compose a feature map using all features (conv + pose)
 featAll = 1./(1+exp(-feat6 - feat12 - log(priorFeat+eps)));
