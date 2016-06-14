@@ -1,5 +1,7 @@
 %% Predict keypoint locations and plot them
 
+% Note: Run extractKpsKITTI.m before running this script
+
 % For each detection in the image set
 for idx = 1:length(dataStructs)
     
@@ -16,7 +18,7 @@ for idx = 1:length(dataStructs)
             [kpCoords,scores] = maxLocationPredict(testFeat, bbox, params.heatMapDims);
             kpCoords = kpCoords(1:2, 1:14);
             [b, bi] = sort(scores, 'descend');
-            [~, ind] = find(scores >= 0.9);
+            [~, ind] = find(scores >= 0.8);
             kpCoords = kpCoords(1:2, ind);
             
         case 'maxLocationCandidates'

@@ -19,7 +19,7 @@ addpath /home/km/ViewpointsAndKeypoints/data/KITTI/devkit_tracking/matlab/
 %% Parameters for KITTI (test data)
 
 % ID of the sequence to be processed
-sequenceNum = 3;
+sequenceNum = 4;
 
 % Mode ('manual', or 'auto'). Specifies if the user will input the bounding
 % box or if they have to be picked up from the ground truth.
@@ -38,10 +38,10 @@ kittiCalibDir = fullfile(kittiBaseDir, 'calib');
 numFrames = length(dir(fullfile(kittiImageDir)))-2;
 
 % ID of the first image to process (in the sequence specified)
-startImageId = 7;
+startImageId = 1;
 % ID of the last image to process (in the sequence specified)
-endImageId = 100;
-% endImageId = numFrames-1;
+% endImageId = 100;
+endImageId = numFrames-1;
 % Creating a list of images to process
 imageList = startImageId:endImageId;
 % ID(s) of the car to track
@@ -113,56 +113,9 @@ for idx = 1:length(imageList)
             curDataStruct.bbox = bbox;
             curDataStruct.fileName = imgFile;
             curDataStruct.labels = single(pascalClassIndex(class));
+            curDataStruct.carId = curTracklet.id;
             
             dataStructs{numDetections} = curDataStruct;
-            
-            % % Run the network on the detection (tracklet)
-            % initViewpointNet;
-            % featVec = runNetOnce(cnn_model, curDataStruct);
-            
-            % % Get pose from the feature vector
-            % % yaw = getPoseFromFeat(featVec);
-            % yaw = getPoseFromFeat_test(featVec);
-            % % Get ground truth yaw
-            % yaw_true = curTracklet.ry*180/pi;
-            
-%             disp('Loading conv6');
-%             initKeypointNet;
-%             featVec_6Kps = runNetOnce(cnn_model_conv6Kps, curDataStruct);
-%             featVec_temp = featVec_6Kps(1945:2448);
-%             feat = flipFeatVecXY(featVec_temp, [6,6]);
-%             feat6 = resizeHeatMapSingle(feat, [6 6], params.heatMapDims);
-%             featConv6 = 1./(1+exp(-feat6));
-%             
-%             disp('Loading conv12');
-%             initCoarseKeypointNet;
-%             featVec_12Kps = runNetOnce(cnn_model_conv12Kps, curDataStruct);
-%             featVec_temp = featVec_12Kps(7777:9792);
-%             feat = flipFeatVecXY(featVec_temp, [12 12]);
-%             feat12 = resizeHeatMapSingle(featVec_temp, [12 12], params.heatMapDims);
-%             featConv12 = 1./(1+exp(-feat12));
-%             
-%             disp('Computing pose prior features');
-%             posePriorFeat = computePosePriors(curDataStruct, featVec);
-%             % featPose = resizeHeatMapSingle(posePriorFeat, [12, 12], params.heatMapDims);
-%             
-%             % testFeat = featConv6 + featConv12;
-%             testFeat = 1./(1+exp(-feat6-feat12-posePriorFeat));
-%             
-%             disp('Predicting keypoints');
-%             [kpCoords,scores] = maxLocationPredict(featConv6, bbox, params.heatMapDims);
-%             scatter(kpCoords(1,:),kpCoords(2,:),50,'r','filled');
-%             
-% %             % Run the keypoint network on the detection (tracklet)
-% %             featVec_kps = runNetOnce(cnn_model_conv6Kps, dataStruct);
-% %             featVec_temp = featVec_kps(1945:2448);
-% %             % disp('Loading conv6');
-% %             feat = flipFeatVecXY(featVec_temp, [6,6]);
-% %             feat6 = resizeHeatMapSingle(feat, [6 6], params.heatMapDims);
-% %             featConv6 = 1./(1+exp(-feat6));
-% %             [kpCoords,scores] = maxLocationPredict(featConv6, bbox, params.heatMapDims);
-% %             kpCoords = kpCoords(1:2,1:14);
-% %             scatter(kpCoords(1,:),kpCoords(2,:),50,'r','filled');
             
         end
         
