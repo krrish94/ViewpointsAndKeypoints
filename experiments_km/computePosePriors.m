@@ -29,8 +29,8 @@ W = params.heatMapDims(1);
 % Kp = size(trainData(1).kps,1);
 Kp = 14;
 
-% Initialize a vector to hold prior likelihoods
-posePriorFeat = zeros(1,Kp*H*W);
+% % Initialize a vector to hold prior likelihoods
+% posePriorFeat = zeros(1,Kp*H*W);
 % Compute prior features (requires poseFeat to be in the form of a rotation
 % matrix)
 poseFeat = predsToRotation(poseFeat');
