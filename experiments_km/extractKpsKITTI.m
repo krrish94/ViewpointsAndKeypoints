@@ -94,7 +94,7 @@ for idx = 1:length(imageList)
                 continue
             end
             
-            % Get the bounding box (x1,y1,x2,y2), required by the CNN)
+            % Get the bounding box (x1,y1,x2,y2), required by the CNN
             bbox = single([curTracklet.x1, curTracklet.y1, curTracklet.x2, curTracklet.y2]);
             % Get the bounding box (x,y,w,h), required by the rect command
             bboxPos = int16([curTracklet.x1, curTracklet.y1, (curTracklet.x2-curTracklet.x1+1), (curTracklet.y2-curTracklet.y1+1)]);
