@@ -114,6 +114,10 @@ for idx = 1:length(imageList)
             curDataStruct.fileName = imgFile;
             curDataStruct.labels = single(pascalClassIndex(class));
             curDataStruct.carId = curTracklet.id;
+            % Image number in the sequence
+            curDataStruct.imgNo = idx;
+            % Detection number in the image
+            curDataStruct.detNo = j;
             
             dataStructs{numDetections} = curDataStruct;
             
