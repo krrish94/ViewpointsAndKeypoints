@@ -48,10 +48,19 @@ end
 
 %% Predict keypoint locations and plot them
 
+% Whether or not to write video output
+writeVideoOutput = true;
+
 % Initialize the GUI
 fig = figure(1);
 imgFile = fullfile(kittiImageDir, sprintf('%06d.png', imageList(1)));
 img = imread(imgFile);
+
+% Create a folder to store the output images
+if writeVideoOutput
+    mkdir(sprintf('kp_results/seq%02d_%03d_%03d', sequenceNum, startImageId, endImageId));
+    set(fig, 'PaperPositionMode', 'auto');
+end
 
 % Sum of all indices we've seen thus far
 idxSum = 0;
@@ -94,7 +103,7 @@ for idx = 1:length(kpDetections)
         [kpCoords,scores] = maxLocationPredict(testFeat, bbox, params.heatMapDims);
         kpCoords = kpCoords(1:2, 1:14);
         [b, bi] = sort(scores, 'descend');
-        [~, ind] = find(scores >= 0.8);
+        [~, ind] = find(scores >= 0.4);
         kpCoords = kpCoords(1:2, ind);
         
         bbox2(1) = bbox(1); bbox2(2) = bbox(2); bbox2(3) = bbox(3)-bbox(1); bbox2(4) = bbox(4)-bbox(2);
@@ -103,6 +112,11 @@ for idx = 1:length(kpDetections)
         
     end
     
+    if writeVideoOutput
+        print(sprintf('kp_results/seq%02d_%03d_%03d/%03d.png', sequenceNum, startImageId, endImageId, imageList(idx)), '-dpng', '-r0');
+    end
+    
+    hold off;
     pause(0.1);
     
 end

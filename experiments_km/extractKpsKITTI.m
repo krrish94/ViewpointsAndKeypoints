@@ -19,7 +19,7 @@ addpath /home/km/ViewpointsAndKeypoints/data/KITTI/devkit_tracking/matlab/
 %% Parameters for KITTI (test data)
 
 % ID of the sequence to be processed
-sequenceNum = 4;
+sequenceNum = 5;
 
 % Mode ('manual', or 'auto'). Specifies if the user will input the bounding
 % box or if they have to be picked up from the ground truth.
@@ -38,7 +38,7 @@ kittiCalibDir = fullfile(kittiBaseDir, 'calib');
 numFrames = length(dir(fullfile(kittiImageDir)))-2;
 
 % ID of the first image to process (in the sequence specified)
-startImageId = 1;
+startImageId = 0;
 % ID of the last image to process (in the sequence specified)
 % endImageId = 100;
 endImageId = numFrames-1;
@@ -62,6 +62,10 @@ dataStructs = {};
 
 % Number of car detections thus far
 numDetections = 0;
+
+% Whether or not to save extracted features
+saveKpFeats = true;
+
 
 %% Initialize the data structs
 
@@ -252,3 +256,8 @@ conv12Feats = resizeHeatMap(conv12Feats, [12 12]);
 
 % Compose a feature map using all features (conv + pose)
 featAll = 1./(1+exp(-conv6Feats-conv12Feats-log(posePriorFeats+eps)));
+
+% Save keypoint features (featAll) if specified
+if saveKpFeats
+    save(fullfile(cachedir,'kpsDataKITTI', sprintf('seq%02d_%03d_%03d', sequenceNum, startImageId, endImageId)), 'featAll');
+end
