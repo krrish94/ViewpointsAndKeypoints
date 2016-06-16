@@ -1,6 +1,6 @@
 function [] = mkdirOptional(dirName)
-%MKDIROPTIONAL Summary of this function goes here
-%   Detailed explanation goes here
+%MKDIROPTIONAL  Checks if directory with name DIRNAME exists. If it doesn't
+%   exist, it is created.
 
 if(~exist(dirName,'dir'))
     mkdir(dirName)
