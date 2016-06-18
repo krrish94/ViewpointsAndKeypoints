@@ -4,50 +4,50 @@ function [] = vpsPascalDataCollect()
 %   Detailed explanation goes here
 
 
-%% Initialize
+% Declaring global variables
 globals;
-delete([rcnnVpsPascalDataDir '/*.mat']);
 
-%% Format of file saved
-% for each image, same file containing -
-% classIndex overlap bbox regionIndex eulers
+% We're working with the car class
+class = pascalIndexToClassLabel(params.classInds);
 
+% Get rotation data for the class
+rotationData = load(fullfile(cachedir, 'rotationDataPascal', class));
+rotationData = rotationData.rotationData;
+% Get only indices that have rotation data corresponding to Pascal images
+rotationData = rotationData(ismember({rotationData(:).dataset}, 'pascal'));
 
-%% Iterate over classes
-classes = {'aeroplane','bicycle','bird','boat','bottle','bus','car','cat','chair','cow','diningtable','dog','horse','motorbike','person','plant','sheep','sofa','train','tvmonitor'};
-classInds = [1 2 4 5 6 7 9 11 14 18 19 20];
+% Optionally, delete all mat folders previously created
+% delete([rcnnVpsPascalDataDir '/*.mat']);
 
-for classInd = classInds
-    class = classes{classInd};
-    disp(class);
-    rotationData = load(fullfile(cachedir,'rotationDataPascal',class));
-    rotationData = rotationData.rotationData;
-    rotationData = rotationData(ismember({rotationData(:).dataset},'pascal'));
+% For each rotation data struct
+for n = 1:length(rotationData)
+    % Name of the data file to be created
+    rcnnDataFile = fullfile([rcnnVpsPascalDataDir '_test'], [rotationData(n).voc_image_id '.mat']);
+    % Get a bunch of overlapping boxes for the current detection
+    bbox = overlappingBoxes(rotationData(n).bbox, rotationData(n).imsize);
+    % Number of non-overlapping boxes thus formed
+    nCands = size(bbox,1);
     
-    for n=1:length(rotationData)
-        %disp([int2str(n) '/' int2str(length(rotationData))]);
-        rcnnDataFile = fullfile(rcnnVpsPascalDataDir,[rotationData(n).voc_image_id '.mat']);
-        bbox = overlappingBoxes(rotationData(n).bbox,rotationData(n).imsize);        
-        nCands = size(bbox,1);
-        
-        classIndex = classInd*ones(nCands,1);
-        overlap = ones(nCands,1); %actually, it's different but we don't really use it
-        regionIndex = zeros(nCands,1);
-        euler = repmat(rotationData(n).euler',nCands,1);
-        imSize = rotationData(n).imsize;
-        
-        %% Saving
-        if(~isempty(classIndex))
-            if(exist(rcnnDataFile,'file'))
-                rcnnData = load(rcnnDataFile);
-                overlap = vertcat(rcnnData.overlap,overlap);
-                euler = vertcat(rcnnData.euler,euler);
-                bbox = vertcat(rcnnData.bbox,bbox);
-                classIndex = vertcat(rcnnData.classIndex,classIndex);
-                regionIndex = vertcat(rcnnData.regionIndex,regionIndex);
-            end
-            save(rcnnDataFile,'overlap','euler','bbox','classIndex','regionIndex','imSize');
+    % Initialize a vector containing class indices
+    classIndex = params.classInds*ones(nCands,1);
+    % Not really used
+    overlap = ones(nCands,1);
+    regionIndex = zeros(nCands,1);
+    % Replicate the rotation data for all candidate overlapping obxes
+    euler = repmat(rotationData(n).euler', nCands, 1);
+    imSize = rotationData(n).imsize;
+    
+    % Saving file
+    if(~isempty(classIndex))
+        if(exist(rcnnDataFile,'file'))
+            rcnnData = load(rcnnDataFile);
+            overlap = vertcat(rcnnData.overlap,overlap);
+            euler = vertcat(rcnnData.euler,euler);
+            bbox = vertcat(rcnnData.bbox,bbox);
+            classIndex = vertcat(rcnnData.classIndex,classIndex);
+            regionIndex = vertcat(rcnnData.regionIndex,regionIndex);
         end
+        save(rcnnDataFile,'overlap','euler','bbox','classIndex','regionIndex','imSize');
     end
 end
 

@@ -1,4 +1,8 @@
-# Viewpoints And Keypoints
+# Viewpoints And Keypoints - KITTI Experiments
+
+[Krishna Murthy](http://krrish94.github.io)
+
+An overhaul of code released for the following publication.
 
 [Shubham Tulsiani](http://cs.berkeley.edu/~shubhtuls) and [Jitendra Malik](http://cs.berkeley.edu/~malik). Viewpoints and Keypoints. In CVPR, 2015.
 

@@ -74,6 +74,10 @@ websiteDir = fullfile(cachedir,'visualization');
 % Directory containing prototxts of network models
 prototxtDir = fullfile(basedir,'prototxts');
 
+% Directories where results will be stored in the subfolders kp_results and
+% vp_results
+resultsDir = fullfile(cachedir, 'results');
+
 
 %% Adding certain folders to Matlab path
 

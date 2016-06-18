@@ -63,6 +63,9 @@ global websiteDir
 % File containing RCNN detections on the validation set for Pascal
 global rcnnDetectionsFile
 
+% Directory containing results
+global resultsDir
+
 
 %% Directories containing CNN definitions, training metadata, etc.
 

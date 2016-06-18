@@ -1,5 +1,5 @@
 function [] = computeDetectionPoses(class,numBins)
-%COMPUTEDETECTIONPOSES Summary of this function goes here
+%COMPUTEDETECTIONPOSES  Summary of this function goes here
 %   Detailed explanation goes here
 globals;
 proto = 'vggAzimuthVpsMirror';

@@ -4,15 +4,11 @@ function [] = mainVpsPreprocess()
 % Declares a set of global variables
 globals;
 
-% For each of the 12 classes in PASCAL3D, read data
-for c = params.classInds
-    % Returns a string containg the class label (eg. 'aeroplane', 'car',
-    % etc.)
-    class = pascalIndexClass(c);
-    disp(['Reading data for : ' class]);
-    % Read in data for the corresponding class
-    readVpsData(class);
-end
+% Returns a string containing the class label (here, 'car')
+class = pascalIndexClass(params.classInds);
+% Read in data for the car class
+disp('Reading data');
+readVpsData(class);
 
 % Create imagewise datastructures for cnn window file generation
 vpsPascalDataCollect();

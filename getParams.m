@@ -1,6 +1,10 @@
 function params = getParams()
-%GET_PARAMS Summary of this function goes here
-%   Detailed explanation goes here
+%GET_PARAMS  Initializes important parameters required for execution
+
+% We're interested only in the 'car' class here. IMPORTANT: Do not define
+% it as a variable, it must be a matrix or some functions may not work. Do
+% not use 'params.classInds = 7', even if it may seem harmless.
+params.classInds = [7];
 
 params.vpsDataset = '';
 params.features = 'vggJointVpsMirror'; %see cache/features folder to see what features are allowed

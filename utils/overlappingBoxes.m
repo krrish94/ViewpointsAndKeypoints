@@ -1,7 +1,22 @@
 function boxes =  overlappingBoxes(box,imgDims)
+% OVERLAPPINGBOXES  Given a bounding box and the dimensions of an image,
+% this function generates a set of overlapping bounding boxes (for creating
+% training proposals).
+
+% One-sixth of the box width
 deltaX = (box(3)-box(1))/6;
+% One sixth of the box height
 deltaY = (box(4)-box(2))/6;
+
+% List to hold overlapping bounding boxes
 boxes = [];
+
+% x1, y1, x2, and y2 correspond to the x,y,x,y coordinates of the top-left
+% and bottom-right points of the window respectively. We generate a lot of
+% windows with sufficient overlap by moving one or more of the top-left or
+% bottom-right coordinates by 1/6th of the box height/width. We generate
+% all such possible combinations first, and then retain only the unique
+% bboxes.
 for x1Shift = -1:1
     for y1Shift = -1:1
         for x2Shift = -1:1
