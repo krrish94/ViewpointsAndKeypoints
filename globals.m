@@ -39,6 +39,9 @@ global rcnnKpsPascalDataDir
 % Directory containing viewpoint annotations for Imagenet, organized by
 % image file name.
 global rcnnVpsImagenetDataDir
+% Directory containing viewpoint annotations for Imagenet, as well as
+% Pascal, organized by image file name
+global viewpointDataDir
 
 % Directory containing rotation data for Pascal, organized by class
 global rotationPascalDataDir
@@ -81,6 +84,7 @@ global prototxtDir
 
 % Viewpoint training metadata
 global finetuneVpsDir
+global VNetTrainFilesDir
 % Keypoint training metadata
 global finetuneKpsDir
 

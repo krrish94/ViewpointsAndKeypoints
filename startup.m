@@ -48,6 +48,9 @@ rcnnVpsImagenetDataDir = fullfile(cachedir,'rcnnVpsImagenetData');
 % Directory containing keypoint annotations generated for Pascal, organized
 % by image file name.
 rcnnKpsPascalDataDir = fullfile(cachedir,'rcnnKpsPascalData');
+% Directory containing keypoint annotations generated for Pascal and
+% Imagenet, organized by image file name.
+viewpointDataDir = fullfile(cachedir, 'viewpointData');
 
 % Directory containing keypoint annotations for Pascal, organized by class
 kpsPascalDataDir = fullfile(cachedir,'kpsDataPascal');
@@ -65,6 +68,7 @@ rotationJointDataDir = fullfile(cachedir,'rotationDataJoint');
 
 % Viewpoint training metadata
 finetuneVpsDir = fullfile(cachedir,'rcnnFinetuneVps');
+VNetTrainFilesDir = fullfile(cachedir, 'VNetTrainFiles');
 % Keypoint training metadata
 finetuneKpsDir = fullfile(cachedir,'rcnnFinetuneKps');
 
@@ -81,7 +85,7 @@ resultsDir = fullfile(cachedir, 'results');
 
 %% Adding certain folders to Matlab path
 
-folders = {'analysisVp','analysisKp','detectionPose','pose','encoding','predict','evaluate','utils','visualization','evaluation','learning','preprocess','rcnnKp','rcnnVp','cnnFeatures', 'experiments_km'};
+folders = {'analysisVp','analysisKp','detectionPose','pose','encoding','predict','evaluate','utils','visualization','evaluation','learning','preprocess','rcnnKp','rcnnVp','cnnFeatures', 'experiments_km', 'viewpointNet'};
 for i=1:length(folders)
     addpath(genpath(folders{i}));
 end
@@ -124,8 +128,10 @@ mkdirOptional(annotationDir);
 mkdirOptional(rcnnVpsImagenetDataDir);
 mkdirOptional(rcnnVpsPascalDataDir);
 mkdirOptional(rcnnKpsPascalDataDir);
+mkdirOptional(viewpointDataDir);
 
 mkdirOptional(finetuneVpsDir);
+mkdirOptional(VNetTrainFilesDir);
 mkdirOptional(finetuneKpsDir);
 
 mkdirOptional(websiteDir);

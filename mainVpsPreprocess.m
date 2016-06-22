@@ -10,13 +10,17 @@ class = pascalIndexClass(params.classInds);
 disp('Reading data');
 readVpsData(class);
 
-% Create imagewise datastructures for cnn window file generation
-vpsPascalDataCollect();
-vpsImagenetDataCollect();
+% Create a data structure for each image that generates the CNN window file
+% used for training. Data is collected from both Imagenet and Pascal.
+collectViewpointData();
 
-% Create cnn training file(s)
-rcnnBinnedJointTrainValTestCreate(''); %generates window file for network that estimates all three euler angles
-rcnnMultibinnedJointTrainValTestCreate([24 16 8 4]); % generates window file for network that estimates azimuth in various bins as desired by pascal3D+ evaluation
+% Create CNN training file(s)
+
+% Generates window file for network that estimates all three euler angles
+createVNetTrainingFile('allData');
+% Generates window file for network that estimates azimuth in various bins
+% as desired by PASCAL 3D+ evaluation
+rcnnMultibinnedJointTrainValTestCreate([24 16 8 4]);
 
 %% Train the CNNs !
 % (not from matlab, unfortunately)

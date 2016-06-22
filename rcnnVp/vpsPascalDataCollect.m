@@ -1,11 +1,18 @@
 function [] = vpsPascalDataCollect()
-
-%RCNNIMAGENETDATACOLLECT Summary of this function goes here
-%   Detailed explanation goes here
+% VPSPASCALDATACOLLECT  Collects viewpoint data for all 'car' images from
+% the Pascal dataset and stores them as mat files in the directory
+% rcnnVpsPascalData, located in cachedir.
+% 
+% For each image, VPSPASCALDATACOLLECT saves a mat file containing the
+% following variables
+%       classIndex, overlap, bbox, regionIndex, eulers
 
 
 % Declaring global variables
 globals;
+
+% Optionally, delete all mat folders previously created
+delete([rcnnVpsPascalDataDir '/*.mat']);
 
 % We're working with the car class
 class = pascalIndexToClassLabel(params.classInds);
@@ -16,13 +23,15 @@ rotationData = rotationData.rotationData;
 % Get only indices that have rotation data corresponding to Pascal images
 rotationData = rotationData(ismember({rotationData(:).dataset}, 'pascal'));
 
-% Optionally, delete all mat folders previously created
-% delete([rcnnVpsPascalDataDir '/*.mat']);
+disp([num2str(length(rotationData)) ' detections obtained']);
+
+% Variable to keep track of the number of files saved
+numFilesSaved = 0;
 
 % For each rotation data struct
 for n = 1:length(rotationData)
     % Name of the data file to be created
-    rcnnDataFile = fullfile([rcnnVpsPascalDataDir '_test'], [rotationData(n).voc_image_id '.mat']);
+    rcnnDataFile = fullfile(rcnnVpsPascalDataDir, [rotationData(n).voc_image_id '.mat']);
     % Get a bunch of overlapping boxes for the current detection
     bbox = overlappingBoxes(rotationData(n).bbox, rotationData(n).imsize);
     % Number of non-overlapping boxes thus formed
@@ -33,11 +42,11 @@ for n = 1:length(rotationData)
     % Not really used
     overlap = ones(nCands,1);
     regionIndex = zeros(nCands,1);
-    % Replicate the rotation data for all candidate overlapping obxes
+    % Replicate the rotation data for all candidate overlapping boxes
     euler = repmat(rotationData(n).euler', nCands, 1);
     imSize = rotationData(n).imsize;
     
-    % Saving file
+    % Saving mat file
     if(~isempty(classIndex))
         if(exist(rcnnDataFile,'file'))
             rcnnData = load(rcnnDataFile);
@@ -48,7 +57,10 @@ for n = 1:length(rotationData)
             regionIndex = vertcat(rcnnData.regionIndex,regionIndex);
         end
         save(rcnnDataFile,'overlap','euler','bbox','classIndex','regionIndex','imSize');
+        numFilesSaved = numFilesSaved + 1;
     end
 end
+
+disp([num2str(numFilesSaved) ' files saved']);
 
 end

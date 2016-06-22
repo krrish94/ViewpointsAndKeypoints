@@ -4,7 +4,7 @@ function params = getParams()
 % We're interested only in the 'car' class here. IMPORTANT: Do not define
 % it as a variable, it must be a matrix or some functions may not work. Do
 % not use 'params.classInds = 7', even if it may seem harmless.
-params.classInds = [7];
+params.classInds = 7;
 
 params.vpsDataset = '';
 params.features = 'vggJointVpsMirror'; %see cache/features folder to see what features are allowed
@@ -21,7 +21,7 @@ params.kpsSuffix = '';
 params.rigidKpsDataset = 'p3d'; %'p3d' or 'pascal'
 params.kpsNet = 'vggAll';
 %params.classInds = [1 2 4 5 6 7 9 14 18 19 20]; %rigid categories
-params.classInds = [1 2 4 5 6 7 9 11 14 18 19 20]; %rigid categories
+% params.classInds = [1 2 4 5 6 7 9 11 14 18 19 20]; %rigid categories
 params.torsoKps = [4 7 1 10]; %for pascal person
 
 params.excludeOccluded = false;
