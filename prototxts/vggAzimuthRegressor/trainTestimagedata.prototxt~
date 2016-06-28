@@ -2,8 +2,8 @@ name: "vggAzimuthRegressor"
 layer {
   name: "ImageData"
   type: "ImageData"
-  top: "label"
   top: "data"
+  top: "label"
     include {
     phase: TRAIN
   }
@@ -16,8 +16,8 @@ layer {
 layer {
   name: "ImageData"
   type: "ImageData"
-  top: "label"
   top: "data"
+  top: "label"
     include {
     phase: TEST
   }
