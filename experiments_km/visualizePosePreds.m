@@ -77,12 +77,11 @@ for i = 1:length(curIdx)
     
     % Compute the transformation from the CAD frame to the viewpoint
     R = angle2dcm(euler(1), euler(2)-pi/2, -euler(3),'ZXZ');
-    R = rotX*R';
-    % R = eye(3);
     % R = [1,0,0;0,0,-1;0,1,0]; % pi/2 about X
     % R = diag([1, -1, -1]); % pi about X
     % R = [cos(pi/4), -sin(pi/4), 0; sin(pi/4), cos(pi/4), 0; 0, 0, 1]*diag([1, -1, -1]); % pi about X, and pi/2 about Z
     % Apply the transformation to the vertices of the CAD model
+    R = rotX*R';
     verticesP = R*vertices';
     verticesP = verticesP';
     
