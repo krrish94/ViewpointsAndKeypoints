@@ -76,16 +76,13 @@ for i = 1:length(curIdx)
     euler = testPreds(i,:);
     
     % Compute the transformation from the CAD frame to the viewpoint
-    % R = angle2dcm(euler(1), euler(2)-pi/2, -euler(3),'ZXZ');
+    R = angle2dcm(euler(1), euler(2)-pi/2, -euler(3),'ZXZ');
+    
     % R = [1,0,0;0,0,-1;0,1,0]; % pi/2 about X
     % R = diag([1, -1, -1]); % pi about X
     % R = [cos(pi/4), -sin(pi/4), 0; sin(pi/4), cos(pi/4), 0; 0, 0, 1]*diag([1, -1, -1]); % pi about X, and pi/2 about Z
     % Apply the transformation to the vertices of the CAD model
-    % R = rotX*R';
-    R = [cos(-euler(3)), -sin(-euler(3)), 0; sin(-euler(3)), cos(-euler(3)), 0; 0, 0, 1]; % -euler(3) about Z
-    R = [1, 0, 0; 0, cos(euler(2)-(pi/2)), -sin(euler(2)-(pi/2)); 0, sin(euler(2)-(pi/2)), cos(euler(2)-(pi/2))]*R; % euler(2)-pi/2 about X
-    R = [cos(euler(1)), -sin(euler(1)), 0; sin(euler(1)), cos(euler(1)), 0; 0, 0, 1]*R; % euler(1) about Z
-    R = rotX*R;
+    R = rotX*R';
     verticesP = R*vertices';
     verticesP = verticesP';
     
