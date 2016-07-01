@@ -17,9 +17,9 @@ cachedir  = fullfile(basedir,'cachedir');
 % Root directory containing the Pascal3D dataset
 PASCAL3Ddir = fullfile(basedir,'data','PASCAL3D');
 % Base directory of Pascal VOC's development kit
-pascalDir = '/home/km/ViewpointsAndKeypoints/data/PASCAL3D/PASCAL/VOCdevkit/';
+pascalDir = '/home/km/code/ViewpointsAndKeypoints/data/PASCAL3D/PASCAL/VOCdevkit/';
 % Directory containing Pascal (VOC) images
-pascalImagesDir = '/home/km/ViewpointsAndKeypoints/data/PASCAL3D/PASCAL/VOCdevkit/VOC2012/JPEGImages';
+pascalImagesDir = '/home/km/code/ViewpointsAndKeypoints/data/PASCAL3D/PASCAL/VOCdevkit/VOC2012/JPEGImages';
 % Directory containing Imagenet images
 imagenetImagesDir = fullfile(basedir,'data','imagenet','images');
 

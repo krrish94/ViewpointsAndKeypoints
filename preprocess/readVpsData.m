@@ -1,6 +1,7 @@
 function [rotationData] = readVpsData(cls)
-%READDATA Summary of this function goes here
-%   Detailed explanation goes here
+% READVPSDATA  Reads rotation data for the current class from Imagenet and
+% Pascal 3D
+
 
 % Declare global variables
 globals;

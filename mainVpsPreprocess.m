@@ -1,4 +1,6 @@
 function [] = mainVpsPreprocess()
+% MAINVPSPREPROCESS  Creates a text file to carry out training of the
+% viewpoint CNN (using coarse and fine bins as mentioned in the paper)
 
 
 % Declares a set of global variables
@@ -8,6 +10,8 @@ globals;
 class = pascalIndexClass(params.classInds);
 % Read in data for the car class
 disp('Reading data');
+
+% Read viewpoint data corresponding to the current class
 readVpsData(class);
 
 % Create a data structure for each image that generates the CNN window file

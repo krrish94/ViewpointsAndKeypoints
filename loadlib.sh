@@ -1,1 +1,1 @@
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/km/ViewpointsAndKeypoints/external/caffe/src/caffe/proto:/home/km/ViewpointsAndKeypoints/external/caffe/install/lib:/home/km/ViewpointsAndKeypoints/external/caffe/src/caffe:/usr/local/cuda-7.5/targets/x86_64-linux/lib
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/km/code/ViewpointsAndKeypoints/external/caffe/src/caffe/proto:/home/km/code/ViewpointsAndKeypoints/external/caffe/install/lib:/home/km/code/ViewpointsAndKeypoints/external/caffe/src/caffe:/usr/local/cuda-7.5/targets/x86_64-linux/lib
