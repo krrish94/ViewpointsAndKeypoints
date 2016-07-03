@@ -1,9 +1,9 @@
 %% Script to evaluate Viewpoint consistency over a KITTI sequence
 
-The aim of this experiment is to check if the predicted viewpoint
-(coarse, i.e., the 21-bin keypoint prediction) is consistent-enough that
-we can start using it for SLAM (after applying temporal priors or median
-filters)
+% The aim of this experiment is to check if the predicted viewpoint
+% (coarse, i.e., the 21-bin keypoint prediction) is consistent-enough that
+% we can start using it for SLAM (after applying temporal priors or median
+% filters)
 
 
 % We're intereseted only in the 'car' class
@@ -14,6 +14,9 @@ warning('off', 'all');
 
 % Declare global variables
 globals;
+
+% Initialize the network for viewpoint prediction
+% initViewpointNet;
 
 % Add KITTI's Matlab code directory to path (in the tracking development
 % kit provided by KITTI)
@@ -86,81 +89,79 @@ for idx = 1:length(imageList)
     % Load the image
     img = imread(imgFile);
     
-    % Tracklet for the current frame (usually comprises of multiple
-    % annotations, again referred to as tracklets)
-    tracklet = tracklets{idx};
+    % If we have to run on a user specified bbox
+    if strcmp(bboxMode, 'manual')
+        % Display the image, and wait for the user to draw a bounding box
+        % around the object of interest
+        imshow(img);
+        r = imrect;
+        position = wait(r);
+        bbox = single([position(1), position(2), position(1)+position(3), position(2)+position(4)]);
     
-    for j = 1:length(tracklet)
-        % Current tracklet (annotation corresponding to a detection)
-        curTracklet = tracklet(j);
-        if ~strcmp(curTracklet.type, 'Car') && ~strcmp(curTracklet.type, 'Van') %|| ~ismember(curTracklet.id,carIds)
-            continue
+    else
+        
+        % Tracklet for the current frame (usually comprises of multiple
+        % annotations, again referred to as tracklets)
+        tracklet = tracklets{imageList(idx)+1};
+        
+        for j = 1:length(tracklet)
+            % Current tracklet (annotation corresponding to a detection)
+            curTracklet = tracklet(j);
+            if ~strcmp(curTracklet.type, 'Car') && ~strcmp(curTracklet.type, 'Van') %|| ~ismember(curTracklet.id,carIds)
+                continue
+            end
+            
+            % If we only have to track specific cars, perform a check if
+            % the car id of the current tracklet is present in the list of
+            % car ids to be tracked
+            if ~ismember(curTracklet.id, carIds) && trackSpecificCars
+                continue
+            end
+            
+            % Get the bounding box (x1,y1,x2,y2), required by the CNN
+            bbox = single([curTracklet.x1, curTracklet.y1, curTracklet.x2, curTracklet.y2]);
+            % Get the bounding box (x,y,w,h), required by the rect command
+            bboxPos = int16([curTracklet.x1, curTracklet.y1, (curTracklet.x2-curTracklet.x1+1), (curTracklet.y2-curTracklet.y1+1)]);
+            % Determine whether or not the object is occluded
+            occluded = curTracklet.occlusion;
+            % Determine whether or not the object is truncated
+            truncated = curTracklet.truncation;
+            
+            if truncated ~= 0 || occluded ~= 0
+                continue
+            end
+            
+            numDetections = numDetections + 1;
+            
+            % Create the data structure for the current detection
+            curDataStruct.bbox = bbox;
+            curDataStruct.fileName = imgFile;
+            curDataStruct.labels = single(pascalClassIndex(class));
+            curDataStruct.carId = curTracklet.id;
+            % Image number in the sequence
+            curDataStruct.imgNo = idx;
+            % Detection number in the image
+            curDataStruct.detNo = j;
+            
+            dataStructs{numDetections} = curDataStruct;
+            
         end
-        
-        % If we only have to track specific cars, perform a check if
-        % the car id of the current tracklet is present in the list of
-        % car ids to be tracked
-        if ~ismember(curTracklet.id, carIds) && trackSpecificCars
-            continue
-        end
-        
-        % Get the bounding box (x1,y1,x2,y2), required by the CNN
-        bbox = single([curTracklet.x1, curTracklet.y1, curTracklet.x2, curTracklet.y2]);
-        % Get the bounding box (x,y,w,h), required by the rect command
-        bboxPos = int16([curTracklet.x1, curTracklet.y1, (curTracklet.x2-curTracklet.x1+1), (curTracklet.y2-curTracklet.y1+1)]);
-        % Determine whether or not the object is occluded
-        occluded = curTracklet.occlusion;
-        % Determine whether or not the object is truncated
-        truncated = curTracklet.truncation;
-        
-        if truncated ~= 0 || occluded ~= 0
-            continue
-        end
-        
-        numDetections = numDetections + 1;
-        
-        % Create the data structure for the current detection
-        curDataStruct.bbox = bbox;
-        curDataStruct.fileName = imgFile;
-        curDataStruct.labels = single(pascalClassIndex(class));
-        curDataStruct.carId = curTracklet.id;
-        % Image number in the sequence
-        curDataStruct.imgNo = idx;
-        % Detection number in the image
-        curDataStruct.detNo = j;
-        % Append the ground-truth azimuth (used in evaluation)
-        curDataStruct.yawTrue = curTracklet.ry;
-        
-        dataStructs{numDetections} = curDataStruct;
         
     end
-    
     
 end
 
 
-% Compute pose features for each detection
+%% Compute pose features for each detection
 
 disp('Computing viewpoint features');
 
-% % Initialize the network used for viewpoint estimation
-% initViewpointNet;
-
-% String used to display progress bar
-progressText = '';
+% Initialize the network used for viewpoint estimation
+initViewpointNet;
 
 poseFeats = [];
 % For each detection in the image set
 for idx = 1:length(dataStructs)
-    
-    % Display progress (every 10 iterations)
-    if mod(idx,10) == 0
-        percentDone = idx*100/length(dataStructs);
-        msg = sprintf('Done: %3.1f', percentDone);
-        fprintf([progressText msg]);
-        progressText = repmat(sprintf('\b'), 1, length(msg));
-    end
-    
     % Current detection to be processed
     curDataStruct = dataStructs{idx};
     % Run the network on the detecion
@@ -170,11 +171,6 @@ for idx = 1:length(dataStructs)
     end
     poseFeats(idx,:) = poseFeatTemp';
 end
-fprintf('\n');
-
-
-
-
 
 
 % %% Compute coarse and fine keypoint features for each detection
