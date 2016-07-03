@@ -178,50 +178,31 @@
 % Get ids of cars in the scene, and the number of frames for which the
 % corresponding car was unoccluded. The second argument indicates that the
 % struct passed as the first argument is same as the data struct passed to
-% the CNN.
+% the 
 carStats = getCarStats(dataStructs, 'dataStruct');
 
-% Ids of cars whose viewpoints have to be displayed
-carIds = 1;
-trackSpecificCars = true;
-
-% Initialize the plot
-figure(1);
-
-% Variables to store the expected (true) and predicted azimuth values
-expectedYaw = [];
-predictedYaw = [];
-
-% For each car detected
-for idx = 1:length(poseFeats)
-    
-    curDataStruct = dataStructs{idx};
-    % Continue, if the current detection doesn't correspond to a car that
-    % we wish to track
-    if ~ismember(curDataStruct.carId, carIds) && trackSpecificCars
-        continue;
-    end
-    
-    % Read in the image and display it
-    img = imread(curDataStruct.fileName);
-    imshow(img);
-    hold on;
-    % Plot the bbox for the current detection
-    bbox = curDataStruct.bbox;
-    bboxPlot = [bbox(1), bbox(2), bbox(3)-bbox(1), bbox(4)-bbox(2)];
-    rectangle('Position', bboxPlot, 'LineWidth', 3, 'EdgeColor', 'g');
-    
-    % expectedYaw = [expectedYaw round((curDataStruct.yawTrue*10.5/pi) + 9.5)];
-    % predictedYaw = [predictedYaw getPoseFromFeat_test(poseFeats(idx,:))];
-    
-    expectedYaw = [expectedYaw curDataStruct.yawTrue*180/pi];
-    predictedYaw = [predictedYaw getPoseFromFeat(poseFeats(idx,:))];
-    
-    
-    
-    pause(0.05);
-    
-end
+% % For each car detected
+% for idx = 1:length(poseFeats)
+%     
+%     curDataStruct = dataStructs{idx};
+%     % Continue, if the current detection doesn't correspond to a car that
+%     % we wish to track
+%     if ~ismember(curDataStruct.carId, carIds) && trackSpecificCars
+%         continue;
+%     end
+%     
+%     % Read in the image and display it
+%     img = imread(curDataStruct.fileName);
+%     imshow(img);
+%     hold on;
+%     % Plot the bbox for the current detection
+%     bbox = curDataStruct.bbox;
+%     bboxPlot = [bbox(1), bbox(2), bbox(3)-bbox(1), bbox(4)-bbox(2)];
+%     rectangle('Position', bboxPlot, 'LineWidth', 3, 'EdgeColor', 'g');
+%     
+%     pause(0.1);
+%     
+% end
 
 
 
