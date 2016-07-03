@@ -13,7 +13,7 @@ globals;
 % initViewpointNet;
 
 % Add KITTI's Matlab code directory to path (the visualization one)
-addpath /home/km/ViewpointsAndKeypoints/data/KITTI/devkit_tracking/matlab/
+addpath /home/km/code/ViewpointsAndKeypoints/data/KITTI/devkit_tracking/matlab/
 
 
 %% Parameters for KITTI (test data)
@@ -44,6 +44,11 @@ startImageId = 0;
 endImageId = numFrames-1;
 % Creating a list of images to process
 imageList = startImageId:endImageId;
+% Whether we should track only specified cars (If this option is set to
+% true, only results corresponding to cars whose IDs are stored in the
+% carIDs variable are evaluated and displayed. Else, all cars that are not
+% occluded/truncated are evaluated and their results are displayed.)
+trackSpecificCars = false;
 % ID(s) of the car to track
 carIds = [9];
 
@@ -95,6 +100,13 @@ for idx = 1:length(imageList)
             % Current tracklet (annotation corresponding to a detection)
             curTracklet = tracklet(j);
             if ~strcmp(curTracklet.type, 'Car') && ~strcmp(curTracklet.type, 'Van') %|| ~ismember(curTracklet.id,carIds)
+                continue
+            end
+            
+            % If we only have to track specific cars, perform a check if
+            % the car id of the current tracklet is present in the list of
+            % car ids to be tracked
+            if ~ismember(curTracklet.id, carIds) && trackSpecificCars
                 continue
             end
             

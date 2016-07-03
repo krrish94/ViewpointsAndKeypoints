@@ -1,424 +1,408 @@
-name: "vggAzimuthRegressor"
-
+name: "vggRigidPoseNet"
 layer {
   name: "data"
-  type: "Data"
+  type: IMAGEDATA
   top: "data"
-  include {
+    include {
     phase: TRAIN
   }
-  transform_param {
-    mirror: false
-    mean_value: 103
-    mean_value: 116
+  
+  image_data_param {
+    source: "/home/aseem/harit_stuff/7scenes/train/train_for_lmdb_img1.txt"
+    batch_size: 20
+    new_height: 224
+    new_width:  224
+  }
+transform_param {
+    crop_size: 224
+    mean_value: 104
+    mean_value: 117
     mean_value: 123
-  }
-  data_param {
-    source: "/home/km/ViewpointsAndKeypoints/cachedir/VNetTrainFiles/trainData_data_lmdb"
-    batch_size: 1
-    backend: LMDB
-  }
+    mirror: true
+ }	
 }
 layer {
   name: "label"
-  type: "Data"
-  top: "label"
+  type: DATA
+  top: "label"  # output
   include {
     phase: TRAIN
   }
-  transform_param {
-    mirror: false
-  }
   data_param {
-    source: "/home/km/ViewpointsAndKeypoints/cachedir/VNetTrainFiles/trainData_score_lmdb"
-    batch_size: 1
+    source: "/home/aseem/harit_stuff/Aseem/scripts/scene7_train_for_lmdb_pose_score_lmdb"
+    batch_size: 20
     backend: LMDB
   }
 }
 layer {
-  name: "data"
-  type: "Data"
-  top: "data"
-  include {
+  name: "Image1"
+  type: IMAGEDATA
+  top: "img0"
+    include {
     phase: TEST
   }
-  transform_param {
-    mirror: false
-    mean_value: 103
-    mean_value: 116
+  image_data_param {
+    source: "/home/aseem/harit_stuff/7scenes/test/test_for_lmdb_img1.txt"
+    batch_size: 20
+    new_height: 224
+    new_width: 224
+  }
+transform_param {
+    crop_size: 224
+    mean_value: 104
+    mean_value: 117
     mean_value: 123
-  }
-  data_param {
-    source: "/home/km/ViewpointsAndKeypoints/cachedir/VNetTrainFiles/testData_data_lmdb"
-    batch_size: 1
-    backend: LMDB
-  }
+    mirror: true
+ }
 }
 layer {
   name: "label"
-  type: "Data"
-  top: "label"
+  type: DATA
+  top: "label"  # output
   include {
     phase: TEST
   }
-  transform_param {
-    mirror: false
-  }
   data_param {
-    source: "/home/km/ViewpointsAndKeypoints/cachedir/VNetTrainFiles/testData_score_lmdb"
-    batch_size: 1
+    source: "/home/aseem/harit_stuff/Aseem/scripts/scene7_train_for_lmdb_pose_score_lmdb"
+    batch_size: 20
     backend: LMDB
   }
 }
-layer {
+layers {
   bottom: "data"
   top: "conv1_1"
   name: "conv1_1"
-  type: "Convolution"
+  type: CONVOLUTION
   convolution_param {
     num_output: 64
     pad: 1
     kernel_size: 3
   }
 }
-layer {
+layers {
   bottom: "conv1_1"
   top: "conv1_1"
   name: "relu1_1"
-  type: "ReLU"
+  type: RELU
 }
-layer {
+layers {
   bottom: "conv1_1"
   top: "conv1_2"
   name: "conv1_2"
-  type: "Convolution"
+  type: CONVOLUTION
   convolution_param {
     num_output: 64
     pad: 1
     kernel_size: 3
   }
 }
-layer {
+layers {
   bottom: "conv1_2"
   top: "conv1_2"
   name: "relu1_2"
-  type: "ReLU"
+  type: RELU
 }
-layer {
+layers {
   bottom: "conv1_2"
   top: "pool1"
   name: "pool1"
-  type: "Pooling"
+  type: POOLING
   pooling_param {
     pool: MAX
     kernel_size: 2
     stride: 2
   }
 }
-layer {
+layers {
   bottom: "pool1"
   top: "conv2_1"
   name: "conv2_1"
-  type: "Convolution"
+  type: CONVOLUTION
   convolution_param {
     num_output: 128
     pad: 1
     kernel_size: 3
   }
 }
-layer {
+layers {
   bottom: "conv2_1"
   top: "conv2_1"
   name: "relu2_1"
-  type: "ReLU"
+  type: RELU
 }
-layer {
+layers {
   bottom: "conv2_1"
   top: "conv2_2"
   name: "conv2_2"
-  type: "Convolution"
+  type: CONVOLUTION
   convolution_param {
     num_output: 128
     pad: 1
     kernel_size: 3
   }
 }
-layer {
+layers {
   bottom: "conv2_2"
   top: "conv2_2"
   name: "relu2_2"
-  type: "ReLU"
+  type: RELU
 }
-layer {
+layers {
   bottom: "conv2_2"
   top: "pool2"
   name: "pool2"
-  type: "Pooling"
+  type: POOLING
   pooling_param {
     pool: MAX
     kernel_size: 2
     stride: 2
   }
 }
-layer {
+layers {
   bottom: "pool2"
   top: "conv3_1"
   name: "conv3_1"
-  type: "Convolution"
+  type: CONVOLUTION
   convolution_param {
     num_output: 256
     pad: 1
     kernel_size: 3
   }
 }
-layer {
+layers {
   bottom: "conv3_1"
   top: "conv3_1"
   name: "relu3_1"
-  type: "ReLU"
+  type: RELU
 }
-layer {
+layers {
   bottom: "conv3_1"
   top: "conv3_2"
   name: "conv3_2"
-  type: "Convolution"
+  type: CONVOLUTION
   convolution_param {
     num_output: 256
     pad: 1
     kernel_size: 3
   }
 }
-layer {
+layers {
   bottom: "conv3_2"
   top: "conv3_2"
   name: "relu3_2"
-  type: "ReLU"
+  type: RELU
 }
-layer {
+layers {
   bottom: "conv3_2"
   top: "conv3_3"
   name: "conv3_3"
-  type: "Convolution"
+  type: CONVOLUTION
   convolution_param {
     num_output: 256
     pad: 1
     kernel_size: 3
   }
 }
-layer {
+layers {
   bottom: "conv3_3"
   top: "conv3_3"
   name: "relu3_3"
-  type: "ReLU"
+  type: RELU
 }
-layer {
+layers {
   bottom: "conv3_3"
   top: "pool3"
   name: "pool3"
-  type: "Pooling"
+  type: POOLING
   pooling_param {
     pool: MAX
     kernel_size: 2
     stride: 2
   }
 }
-layer {
+layers {
   bottom: "pool3"
   top: "conv4_1"
   name: "conv4_1"
-  type: "Convolution"
+  type: CONVOLUTION
   convolution_param {
     num_output: 512
     pad: 1
     kernel_size: 3
   }
 }
-layer {
+layers {
   bottom: "conv4_1"
   top: "conv4_1"
   name: "relu4_1"
-  type: "ReLU"
+  type: RELU
 }
-layer {
+layers {
   bottom: "conv4_1"
   top: "conv4_2"
   name: "conv4_2"
-  type: "Convolution"
+  type: CONVOLUTION
   convolution_param {
     num_output: 512
     pad: 1
     kernel_size: 3
   }
 }
-layer {
+layers {
   bottom: "conv4_2"
   top: "conv4_2"
   name: "relu4_2"
-  type: "ReLU"
+  type: RELU
 }
-layer {
+layers {
   bottom: "conv4_2"
   top: "conv4_3"
   name: "conv4_3"
-  type: "Convolution"
+  type: CONVOLUTION
   convolution_param {
     num_output: 512
     pad: 1
     kernel_size: 3
   }
 }
-layer {
+layers {
   bottom: "conv4_3"
   top: "conv4_3"
   name: "relu4_3"
-  type: "ReLU"
+  type: RELU
 }
-layer {
+layers {
   bottom: "conv4_3"
   top: "pool4"
   name: "pool4"
-  type: "Pooling"
+  type: POOLING
   pooling_param {
     pool: MAX
     kernel_size: 2
     stride: 2
   }
 }
-layer {
+layers {
   bottom: "pool4"
   top: "conv5_1"
   name: "conv5_1"
-  type: "Convolution"
+  type: CONVOLUTION
   convolution_param {
     num_output: 512
     pad: 1
     kernel_size: 3
   }
 }
-layer {
+layers {
   bottom: "conv5_1"
   top: "conv5_1"
   name: "relu5_1"
-  type: "ReLU"
+  type: RELU
 }
-layer {
+layers {
   bottom: "conv5_1"
   top: "conv5_2"
   name: "conv5_2"
-  type: "Convolution"
+  type: CONVOLUTION
   convolution_param {
     num_output: 512
     pad: 1
     kernel_size: 3
   }
 }
-layer {
+layers {
   bottom: "conv5_2"
   top: "conv5_2"
   name: "relu5_2"
-  type: "ReLU"
+  type: RELU
 }
-layer {
+layers {
   bottom: "conv5_2"
   top: "conv5_3"
   name: "conv5_3"
-  type: "Convolution"
+  type: CONVOLUTION
   convolution_param {
     num_output: 512
     pad: 1
     kernel_size: 3
   }
 }
-layer {
+layers {
   bottom: "conv5_3"
   top: "conv5_3"
   name: "relu5_3"
-  type: "ReLU"
+  type: RELU
 }
-layer {
+layers {
   bottom: "conv5_3"
   top: "pool5"
   name: "pool5"
-  type: "Pooling"
+  type: POOLING
   pooling_param {
     pool: MAX
     kernel_size: 2
     stride: 2
   }
 }
-layer {
+layers {
   bottom: "pool5"
   top: "fc6"
   name: "fc6"
-  type: "InnerProduct"
+  type: INNER_PRODUCT
   inner_product_param {
     num_output: 4096
   }
 }
-layer {
+layers {
   bottom: "fc6"
   top: "fc6"
   name: "relu6"
-  type: "ReLU"
+  type: RELU
 }
-layer {
+layers {
   bottom: "fc6"
   top: "fc6"
   name: "drop6"
-  type: "Dropout"
+  type: DROPOUT
   dropout_param {
     dropout_ratio: 0.5
   }
 }
-layer {
+layers {
   bottom: "fc6"
   top: "fc7"
   name: "fc7"
-  type: "InnerProduct"
+  type: INNER_PRODUCT
   inner_product_param {
     num_output: 4096
   }
 }
-layer {
+layers {
   bottom: "fc7"
   top: "fc7"
   name: "relu7"
-  type: "ReLU"
+  type: RELU
 }
-layer {
+layers {
   bottom: "fc7"
   top: "fc7"
   name: "drop7"
-  type: "Dropout"
+  type: DROPOUT
   dropout_param {
     dropout_ratio: 0.5
   }
 }
-layer {
+layers {
   bottom: "fc7"
-  top: "fc8"
-  name: "fc8"
-  type: "InnerProduct"
-  inner_product_param {
-    num_output: 64
-  }
-}
-layer {
-  bottom: "fc8"
-  top: "fc9"
-  name: "fc9"
-  type: "InnerProduct"
-  inner_product_param {
+  top: "fc8_pose"
+  name: INNER_PRODUCT
+  inner_product_param{
     num_output: 2
   }
 }
-layer {
-  name:"loss"
-  type: "EuclideanLoss"
-  bottom:"fc9"
-  bottom:"label"
-  top:"loss"
-  include {
-    phase: TRAIN
-  }
+layers {
+  name: "loss"
+  type: EUCLIDEAN_LOSS
+  bottom: "fc8"
+  bottom: "label"
 }

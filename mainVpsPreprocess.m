@@ -21,7 +21,7 @@ collectViewpointData();
 % Create CNN training file(s)
 
 % Generates window file for network that estimates all three euler angles
-createVNetTrainingFile('allData');
+createVNetTrainingFile('pascal_imagenet_trainData');
 % Generates window file for network that estimates azimuth in various bins
 % as desired by PASCAL 3D+ evaluation
 rcnnMultibinnedJointTrainValTestCreate([24 16 8 4]);

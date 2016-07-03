@@ -19,7 +19,9 @@ globals;
 load(fullfile(cachedir, 'imagenetTrainIds.mat'));
 load(fullfile(cachedir, 'pascalTrainValIds.mat'));
 
-fileNames = unique(vertcat(trainIds, valIds, fnamesTrain));
+% Concatenate Pascal train ids, and Imagenet train filenames
+% fileNames = unique(vertcat(trainIds, valIds, fnamesTrain));
+fileNames = unique(vertcat(trainIds, fnamesTrain));
 
 disp('Generating CNN window file');
 
@@ -29,11 +31,18 @@ fid = fopen(txtFile, 'w+');
 
 count = 0;
 
+% Variables to display progress text
+reverseStr = '';
+
 % Write data to file
 for j = 1:length(fileNames)
     
-    if mod(j,10000) == 0
-        disp(j);
+    % Display progress (after every 100 iters)
+    if mod(j,100) == 0
+        percentDone = j*100/length(fileNames);
+        msg = sprintf('Done: %3.1f', percentDone);
+        fprintf([reverseStr, msg]);
+        reverseStr = repmat(sprintf('\b'), 1, length(msg));
     end
     
     % Current fileName
@@ -70,23 +79,33 @@ for j = 1:length(fileNames)
     %   classIndex, overlap, x1, y1, x2, y2, euler1,2,3 (coarse), euler
     %   1,2,3,(fine)
     
-    fprintf(fid,'# %d\n%s\n%d\n%d\n%d\n%d\n',count-1,imgFile,3,imSize(1),imSize(2),numCands);
+    % fprintf(fid,'# %d\n%s\n%d\n%d\n%d\n%d\n',count-1,imgFile,3,imSize(1),imSize(2),numCands);
+    
     %if(max(cands.euler(:,1))>=pi/2 || max(cands.euler(:,2)>=pi/2 ))
     %    disp('Oops');
     %end
     for n=1:size(cands.overlap,1)
         
-        fprintf(fid,'%d %f %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n',...
-            cands.classIndex(n),cands.overlap(n),...
-            cands.bbox(n,1),cands.bbox(n,2),cands.bbox(n,3),cands.bbox(n,4),...
-            ceil(cands.euler(n,1)*10.5/pi+9.5),ceil(-cands.euler(n,1)*10.5/pi+9.5),...
-            ceil(cands.euler(n,2)*10.5/pi+9.5),ceil(cands.euler(n,2)*10.5/pi+9.5),...
-            floor(cands.euler(n,3)*10.5/pi),20-floor(cands.euler(n,3)*10.5/pi),...
-            ceil(cands.euler(n,1)*3.5/pi+2.5),ceil(-cands.euler(n,1)*3.5/pi+2.5),...
-            ceil(cands.euler(n,2)*3.5/pi+2.5),ceil(cands.euler(n,2)*3.5/pi+2.5),...
-            floor(cands.euler(n,3)*3.5/pi),6-floor(cands.euler(n,3)*3.5/pi));
+        fprintf(fid, '%s %d %d %d %d %d %d %f %f %f %f %f %f', imgFile, ...
+            imSize(1), imSize(2), cands.bbox(n,1), cands.bbox(n,2), ...
+            cands.bbox(n,3), cands.bbox(n,4), sin(cands.euler(n,1)), ...
+            cos(cands.euler(n,1)), sin(cands.euler(n,2)), ...
+            cos(cands.euler(n,2)), sin(cands.euler(n,3)), ...
+            cos(cands.euler(n,3)));
+        
+%         fprintf(fid,'%d %f %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n',...
+%             cands.classIndex(n),cands.overlap(n),...
+%             cands.bbox(n,1),cands.bbox(n,2),cands.bbox(n,3),cands.bbox(n,4),...
+%             ceil(cands.euler(n,1)*10.5/pi+9.5),ceil(-cands.euler(n,1)*10.5/pi+9.5),...
+%             ceil(cands.euler(n,2)*10.5/pi+9.5),ceil(cands.euler(n,2)*10.5/pi+9.5),...
+%             floor(cands.euler(n,3)*10.5/pi),20-floor(cands.euler(n,3)*10.5/pi),...
+%             ceil(cands.euler(n,1)*3.5/pi+2.5),ceil(-cands.euler(n,1)*3.5/pi+2.5),...
+%             ceil(cands.euler(n,2)*3.5/pi+2.5),ceil(cands.euler(n,2)*3.5/pi+2.5),...
+%             floor(cands.euler(n,3)*3.5/pi),6-floor(cands.euler(n,3)*3.5/pi));
     end
 end
+
+fprintf('\n');
 
 % Close the file
 fclose(fid);
