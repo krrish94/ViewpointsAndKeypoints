@@ -23,7 +23,7 @@ addpath /home/km/code/ViewpointsAndKeypoints/data/KITTI/devkit_tracking/matlab/
 %% Parameters for KITTI (test data)
 
 % ID of the sequence to be processed
-sequenceNum = 10;
+sequenceNum = 4;
 
 % Mode ('manual', or 'auto'). Specifies if the user will input the bounding
 % box or if they have to be picked up from the ground truth.
@@ -54,7 +54,7 @@ imageList = startImageId:endImageId;
 % occluded/truncated are evaluated and their results are displayed.)
 trackSpecificCars = true;
 % ID(s) of the car to track
-carIds = [0];
+carIds = [2];
 
 % % Create an array to store the predictions
 % yawPreds = zeros(size(imageList));
@@ -122,7 +122,7 @@ for idx = 1:length(imageList)
         numDetections = numDetections + 1;
         
         % Create the data structure for the current detection
-        curDataStruct.bbox = bbox;
+        curDataStruct.bbox = single(bbox);
         curDataStruct.fileName = imgFile;
         curDataStruct.labels = single(pascalClassIndex(class));
         curDataStruct.carId = curTracklet.id;
@@ -257,6 +257,17 @@ if shouldPlot
     hold off;
 end
 
+
+%% Get consistency statistics
+
+% Whether or not to save the generated plots
+saveConsistencyPlots = false;
+
+% If they have to be saved, specify the directory name
+if saveConsistencyPlots
+    vpConsistencyResultsdir = fullfile(resultsDir, 'vp_results', 'viewpointConsistency');
+end
+
 % Make a consistency plot (plot expected yaw and predicted yaw)
 figure(1);
 plot(expectedYaw, 'g', 'LineWidth', 2);
@@ -269,6 +280,20 @@ ylabel('Azimuth bin number (total 21 bins)');
 title(sprintf('Consistency of Azimuth prediction over frames \n Car ID %02d, seq %02d, frames: %03d-%03d \n Number of accurate predictions: %03d/%03d', carIdsToShow, sequenceNum, startImageId, endImageId, sum(expectedYaw == predictedYaw), length(expectedYaw)));
 % text(50,22, sprintf('Number of accurate predictions: %03d/%03d', sum(expectedYaw == predictedYaw), length(expectedYaw)));
 
+% Different median filter window sizes to try out
+windowSizes = [5,7,15];
+for i = 1:length(windowSizes)
+    filteredYaw = testMedianFilter(predictedYaw, windowSizes(i));
+    figure;
+    plot(expectedYaw, 'g', 'LineWidth', 2);
+    hold on;
+    plot(filteredYaw, 'r', 'LineWidth', 2);
+    hold off;
+    legend({'True', sprintf('Filtered (windowsize: %d)', windowSizes(i))});
+    xlabel(sprintf('Frame number/Time'));
+    ylabel('Azimuth bin number (total 21 bins)');
+    title(sprintf('Consistency of Azimuth prediction over frames \n Car ID %02d, seq %02d, frames: %03d-%03d \n Number of accurate predictions: %03d/%03d', carIdsToShow, sequenceNum, startImageId, endImageId, sum(expectedYaw == filteredYaw), length(expectedYaw)));
+end
 
 
 
