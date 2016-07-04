@@ -260,40 +260,28 @@ end
 
 %% Get consistency statistics
 
+% Generate a struct that is to be passed to the function to generate
+% viewpoint consistency statistics. The struct contains general
+% information viz., sequence number, car ID being tracked, start and end
+% frames of the sequence
+infoStruct.seqNum = sequenceNum;
+infoStruct.carId = carIdsToShow;
+infoStruct.firstFrameId = startImageId;
+infoStruct.lastFrameId = endImageId;
+
 % Whether or not to save the generated plots
-saveConsistencyPlots = false;
+saveConsistencyPlots = true;
 
-% If they have to be saved, specify the directory name
-if saveConsistencyPlots
-    vpConsistencyResultsdir = fullfile(resultsDir, 'vp_results', 'viewpointConsistency');
-end
+% Get statistics. Optionally save them to the appropriate directory in the
+% results directory (in 'cachedir'). The fourth parameter specifies whether
+% or not to save these plots
+getViewpointConsistencyStats(expectedYaw, predictedYaw, infoStruct, saveConsistencyPlots);
 
-% Make a consistency plot (plot expected yaw and predicted yaw)
-figure(1);
-plot(expectedYaw, 'g', 'LineWidth', 2);
-hold on;
-plot(predictedYaw, 'r', 'LineWidth', 2);
-hold off;
-legend({'True', 'Predicted'});
-xlabel(sprintf('Frame number/Time'));
-ylabel('Azimuth bin number (total 21 bins)');
-title(sprintf('Consistency of Azimuth prediction over frames \n Car ID %02d, seq %02d, frames: %03d-%03d \n Number of accurate predictions: %03d/%03d', carIdsToShow, sequenceNum, startImageId, endImageId, sum(expectedYaw == predictedYaw), length(expectedYaw)));
-% text(50,22, sprintf('Number of accurate predictions: %03d/%03d', sum(expectedYaw == predictedYaw), length(expectedYaw)));
 
-% Different median filter window sizes to try out
-windowSizes = [5,7,15];
-for i = 1:length(windowSizes)
-    filteredYaw = testMedianFilter(predictedYaw, windowSizes(i));
-    figure;
-    plot(expectedYaw, 'g', 'LineWidth', 2);
-    hold on;
-    plot(filteredYaw, 'r', 'LineWidth', 2);
-    hold off;
-    legend({'True', sprintf('Filtered (windowsize: %d)', windowSizes(i))});
-    xlabel(sprintf('Frame number/Time'));
-    ylabel('Azimuth bin number (total 21 bins)');
-    title(sprintf('Consistency of Azimuth prediction over frames \n Car ID %02d, seq %02d, frames: %03d-%03d \n Number of accurate predictions: %03d/%03d', carIdsToShow, sequenceNum, startImageId, endImageId, sum(expectedYaw == filteredYaw), length(expectedYaw)));
-end
+
+
+
+
 
 
 
