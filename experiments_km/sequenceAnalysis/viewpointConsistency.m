@@ -23,7 +23,7 @@ addpath /home/km/code/ViewpointsAndKeypoints/data/KITTI/devkit_tracking/matlab/
 %% Parameters for KITTI (test data)
 
 % ID of the sequence to be processed
-sequenceNum = 4;
+sequenceNum = 4;  % Uncomment if running this script independently
 
 % Mode ('manual', or 'auto'). Specifies if the user will input the bounding
 % box or if they have to be picked up from the ground truth.
@@ -54,7 +54,7 @@ imageList = startImageId:endImageId;
 % occluded/truncated are evaluated and their results are displayed.)
 trackSpecificCars = true;
 % ID(s) of the car to track
-carIds = [2];
+carIds = [2];  % Uncomment if running this script independently
 
 % % Create an array to store the predictions
 % yawPreds = zeros(size(imageList));
