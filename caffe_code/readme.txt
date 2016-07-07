@@ -1,0 +1,1 @@
+This folder contains code for the Caffe files that I modified.

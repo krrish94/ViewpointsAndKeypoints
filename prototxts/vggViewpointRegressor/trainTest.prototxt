@@ -1,15 +1,12 @@
-name: "vggRigidPoseNet"
+name: "vggViewpointRegressor"
 layers {
   name: "data"
   type: WINDOW_POSE_DATA_REGRESSION
   top: "data"
-  top: "label"
+  top: "labels"
   window_data_param {
     source: "/home/km/code/ViewpointsAndKeypoints/cachedir/VNetTrainFiles/pascal_imagenet_trainData.txt"
-    batch_size: 256
-    fg_threshold: 0.5
-    bg_threshold: 0.5
-    fg_fraction: 1.0
+    batch_size: 64
     context_pad: 16
     crop_mode: "warp"
   }
@@ -23,13 +20,10 @@ layers {
   name: "data"
   type: WINDOW_POSE_DATA_REGRESSION
   top: "data"
-  top: "label"
+  top: "labels"
   window_data_param {
-    source: "/home/km/code/ViewpointsAndKeypoint/cachedir/VNetTrainFiles/pascal_imagenet_valData.txt"
+    source: "/home/km/code/ViewpointsAndKeypoints/cachedir/VNetTrainFiles/pascal_imagenet_valData.txt"
     batch_size: 20
-    fg_threshold: 0.5
-    bg_threshold: 0.5
-    fg_fraction: 1.0
     context_pad: 16
     crop_mode: "warp"
   }
@@ -366,14 +360,27 @@ layers {
 layers {
   bottom: "fc7"
   top: "fc8"
-  name: INNER_PRODUCT
+  name: "fc8"
+  type: INNER_PRODUCT
   inner_product_param{
-    num_output: 6
+    num_output: 4
   }
 }
+# layers {
+#   name: "concat_outputs"
+#   type: CONCAT
+#   bottom: "sin_azimuth"
+#   bottom: "cos_azimuth"
+#   bottom: "sin_elevation"
+#   bottom: "cos_elevation"
+#   top: "label"
+#   concat_param {
+#     concat_dim: 1
+#   }
+# }
 layers {
-  name: "loss3c"
+  name: "loss"
   type: EUCLIDEAN_LOSS
   bottom: "fc8"
-  bottom: "label"
+  bottom: "labels"
 }

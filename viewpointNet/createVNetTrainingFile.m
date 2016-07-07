@@ -20,8 +20,11 @@ load(fullfile(cachedir, 'imagenetTrainIds.mat'));
 load(fullfile(cachedir, 'pascalTrainValIds.mat'));
 
 % Concatenate Pascal train ids, and Imagenet train filenames
-% fileNames = unique(vertcat(trainIds, valIds, fnamesTrain));
+
+% Use the following for training
 fileNames = unique(vertcat(trainIds, fnamesTrain));
+% Use the following for validation
+% fileNames = unique(vertcat(valIds));
 
 disp('Generating CNN window file');
 
@@ -58,6 +61,11 @@ for j = 1:length(fileNames)
     if isempty(cands.overlap)
         continue;
     end
+    
+    % Hack by KM
+    params.candidateThresh = 1;
+    %
+    
     numCands = round(sum(cands.overlap >= params.candidateThresh));
     if numCands == 0
         continue;
@@ -79,19 +87,31 @@ for j = 1:length(fileNames)
     %   classIndex, overlap, x1, y1, x2, y2, euler1,2,3 (coarse), euler
     %   1,2,3,(fine)
     
-    % fprintf(fid,'# %d\n%s\n%d\n%d\n%d\n%d\n',count-1,imgFile,3,imSize(1),imSize(2),numCands);
+    fprintf(fid,'# %d\n%s\n%d\n%d\n%d\n%d\n', count-1, imgFile, ...
+            3, imSize(1), imSize(2), numCands);
     
     %if(max(cands.euler(:,1))>=pi/2 || max(cands.euler(:,2)>=pi/2 ))
     %    disp('Oops');
     %end
     for n=1:size(cands.overlap,1)
         
-        fprintf(fid, '%s %d %d %d %d %d %d %f %f %f %f %f %f', imgFile, ...
-            imSize(1), imSize(2), cands.bbox(n,1), cands.bbox(n,2), ...
-            cands.bbox(n,3), cands.bbox(n,4), sin(cands.euler(n,1)), ...
-            cos(cands.euler(n,1)), sin(cands.euler(n,2)), ...
-            cos(cands.euler(n,2)), sin(cands.euler(n,3)), ...
-            cos(cands.euler(n,3)));
+        fprintf(fid, '%d %d %d %d %f %f %f %f\n', cands.bbox(n,1), ...
+            cands.bbox(n,2), cands.bbox(n,3), cands.bbox(n,4), ...
+            sin(cands.euler(n,3)), cos(cands.euler(n,3)), ...
+            sin(cands.euler(n,1)), cos(cands.euler(n,1)));
+
+        
+        % Don't use the following file format. Window data layer modified
+        % for regression by KM does not understand this format.
+        
+%         fprintf(fid, '%s %d %d %d %d %d %d %f %f %f %f %f %f', imgFile, ...
+%             imSize(1), imSize(2), cands.bbox(n,1), cands.bbox(n,2), ...
+%             cands.bbox(n,3), cands.bbox(n,4), sin(cands.euler(n,1)), ...
+%             cos(cands.euler(n,1)), sin(cands.euler(n,2)), ...
+%             cos(cands.euler(n,2)), sin(cands.euler(n,3)), ...
+%             cos(cands.euler(n,3)));
+
+        % Original format (as Shubham defined it)
         
 %         fprintf(fid,'%d %f %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n',...
 %             cands.classIndex(n),cands.overlap(n),...

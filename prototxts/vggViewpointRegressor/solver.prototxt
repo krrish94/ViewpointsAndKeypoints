@@ -1,5 +1,4 @@
-# net: "/home/harit/ViewpointsAndKeypoints-master/prototxts/vggJointVps/trainTest.prototxt"
-net: "/home/falak/DeepLearning/ViewpointsAndKeypoints/prototxts/vggJointVps/trainTest.prototxt"
+net: "/home/km/code/ViewpointsAndKeypoints/prototxts/vggViewpointRegressor/trainTest.prototxt"
 test_iter: 100
 test_interval: 1000
 base_lr: 0.001
@@ -11,5 +10,4 @@ max_iter: 70000
 momentum: 0.9
 weight_decay: 0.0005
 snapshot: 10000
-# snapshot_prefix: "/home/harit/ViewpointsAndKeypoints-master/cachedir/snapshots/vggJointVps"
-snapshot_prefix: "/home/falak/DeepLearning/ViewpointsAndKeypoints/snapshots/vggJointVps/net"
+snapshot_prefix: "/home/km/code/ViewpointsAndKeypoints/snapshots/vggViewpointRegressor/net"
