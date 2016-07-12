@@ -40,8 +40,8 @@ numFrames = length(dir(fullfile(kittiImageDir)))-2;
 % ID of the first image to process (in the sequence specified)
 startImageId = 0;
 % ID of the last image to process (in the sequence specified)
-% endImageId = 100;
-endImageId = numFrames-1;
+endImageId = 20;
+% endImageId = numFrames-1;
 % Creating a list of images to process
 imageList = startImageId:endImageId;
 % Whether we should track only specified cars (If this option is set to
@@ -215,7 +215,7 @@ for idx = 1:length(dataStructs)
 end
 
 
-%% Compute pose prior heatmaps for each detection
+% Compute pose prior heatmaps for each detection
 
 disp('Computing pose prior heatmaps');
 
@@ -232,8 +232,11 @@ if ~exist('rData', 'var')
 end
 % Extracting training samples and augmenting keypoints
 if ~exist('trainData', 'var')
-    trainData = rData(ismember({rData(:).voc_image_id},trainIds));
-    trainData = augmentKps(trainData,dataStruct);
+    trainData = rData(ismember({rData(:).voc_image_id}, trainIds));
+    % Note: the parameter passed to the following function isn't the
+    % 'dataStructs' variable we create, but the 'dataStruct' variable that
+    % contains ground truth annotations from Pascal/Imagenet
+    trainData = augmentKps(trainData, dataStruct);
 end
 
 % For each detection in the image set
