@@ -1,5 +1,5 @@
 function [kpCoords,scores] = maxLocationPredict(heatMap,bbox,dims)
-%MAXPREDICT Summary of this function goes here
+% MAXPREDICT  Summary of this function goes here
 %   Detailed explanation goes here
 
 assert(size(heatMap,1)==1,'Heatmap should be 1 X (Nkps*Dims)');

@@ -5,6 +5,7 @@
 
 % Declaring global varaibles
 globals;
+
 % Loading the train/test split for Pascal
 load(fullfile(cachedir,'pascalTrainValIds'));
 

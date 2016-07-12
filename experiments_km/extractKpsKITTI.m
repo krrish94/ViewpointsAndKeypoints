@@ -274,5 +274,5 @@ featAll = 1./(1+exp(-conv6Feats-conv12Feats-log(posePriorFeats+eps)));
 
 % Save keypoint features (featAll) if specified
 if saveKpFeats
-    save(fullfile(cachedir,'kpsDataKITTI', sprintf('seq%02d_%03d_%03d', sequenceNum, startImageId, endImageId)), 'featAll');
+    save(fullfile(cachedir,'kpsDataKITTI', sprintf('seq%02d_%03d_%03d', sequenceNum, startImageId, endImageId)), 'featAll', 'conv6Feats', 'conv12Feats', 'posePriorFeats');
 end
