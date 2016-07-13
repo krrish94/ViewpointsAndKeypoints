@@ -5,6 +5,9 @@ function params = getParams()
 % it as a variable, it must be a matrix or some functions may not work. Do
 % not use 'params.classInds = 7', even if it may seem harmless.
 params.classInds = 7;
+% The 'car' class has 14 keypoints. Hard-coding it here, as I expect to run
+% this code only on cars
+params.numKps = 14;
 
 params.vpsDataset = '';
 params.features = 'vggJointVpsMirror'; %see cache/features folder to see what features are allowed
