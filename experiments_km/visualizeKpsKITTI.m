@@ -19,37 +19,59 @@ curDetections = {};
 
 % For each dataStruct
 for idx = 1:length(dataStructs)
-    % If the current image filename is different from the one that we've
-    % been processing until now
+    % Compare the current image filename with the previous. If the filename
+    % has changed, create a new index in the cell
     if ~strcmp(dataStructs{idx}.fileName, prevFileName)
-        
-        % If this is not the first index (idx), then we've completed
-        % collecting detections from one image. Add them to kpDetections.
-        if idx ~= 1
-            kpDetections{curImgIdx} = curDetections;
-        end
-        
-        % Update prevFileName
-        prevFileName = dataStructs{idx}.fileName;
-        % Update the index of the current image
+        % Increment the index of the current image
         curImgIdx = curImgIdx + 1;
-        % Update the detection index in the current image
+        % Reset the index of the detections in the current image
         curDetIdx = 1;
-        % Array to hold detections in the current image
-        curDetections = {};
+        % Store the data struct at the appropriate index
+        kpDetections{curImgIdx}{curDetIdx} = dataStructs{idx};
+        % Update the previous image filename
+        prevFileName = dataStructs{idx}.fileName;
     else
-        % Update curDetIdx
+        % Increment the index of the detections in the current image
         curDetIdx = curDetIdx + 1;
+        % Store the data struct at the appropriate index
+        kpDetections{curImgIdx}{curDetIdx} = dataStructs{idx};
     end
-    % Append the current dataStruct to the appropriate array
-    curDetections{curDetIdx} = dataStructs{idx};
 end
+
+% % The following snippet has been abandoned after failing a unit test.
+% % For each dataStruct
+% for idx = 1:length(dataStructs)
+%     % If the current image filename is different from the one that we've
+%     % been processing until now
+%     if ~strcmp(dataStructs{idx}.fileName, prevFileName)
+%         
+%         % If this is not the first index (idx), then we've completed
+%         % collecting detections from one image. Add them to kpDetections.
+%         if idx ~= 1
+%             kpDetections{curImgIdx} = curDetections;
+%         end
+%         
+%         % Update prevFileName
+%         prevFileName = dataStructs{idx}.fileName;
+%         % Update the index of the current image
+%         curImgIdx = curImgIdx + 1;
+%         % Update the detection index in the current image
+%         curDetIdx = 1;
+%         % Array to hold detections in the current image
+%         curDetections = {};
+%     else
+%         % Update curDetIdx
+%         curDetIdx = curDetIdx + 1;
+%     end
+%     % Append the current dataStruct to the appropriate array
+%     curDetections{curDetIdx} = dataStructs{idx};
+% end
 
 
 %% Predict keypoint locations and plot them
 
 % Whether or not to write video output
-writeVideoOutput = true;
+writeVideoOutput = false;
 
 % Initialize the GUI
 fig = figure(1);
@@ -120,6 +142,7 @@ for idx = 1:length(kpDetections)
     pause(0.1);
     
 end
+
 
 
 %% Old (primitive) GUI

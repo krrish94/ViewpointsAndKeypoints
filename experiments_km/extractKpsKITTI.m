@@ -19,7 +19,7 @@ addpath /home/km/code/ViewpointsAndKeypoints/data/KITTI/devkit_tracking/matlab/
 %% Parameters for KITTI (test data)
 
 % ID of the sequence to be processed
-sequenceNum = 5;
+sequenceNum = 1;
 
 % Mode ('manual', or 'auto'). Specifies if the user will input the bounding
 % box or if they have to be picked up from the ground truth.
@@ -40,7 +40,7 @@ numFrames = length(dir(fullfile(kittiImageDir)))-2;
 % ID of the first image to process (in the sequence specified)
 startImageId = 0;
 % ID of the last image to process (in the sequence specified)
-endImageId = 20;
+endImageId = 0;
 % endImageId = numFrames-1;
 % Creating a list of images to process
 imageList = startImageId:endImageId;
@@ -69,7 +69,7 @@ dataStructs = {};
 numDetections = 0;
 
 % Whether or not to save extracted features
-saveKpFeats = true;
+saveKpFeats = false;
 
 
 %% Initialize the data structs
