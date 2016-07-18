@@ -1,11 +1,11 @@
-name: "CaffeNet"
+name: "vggViewpointRegressor"
 input: "data"
-input_dim: 20
+input_dim: 1
 input_dim: 3
 input_dim: 224
 input_dim: 224
 input: "label"
-input_dim: 20
+input_dim: 1
 input_dim: 1
 input_dim: 1
 input_dim: 1
@@ -334,202 +334,11 @@ layers {
   }
 }
 layers {
-  name: "fc8_e1"
-  type: INNER_PRODUCT
   bottom: "fc7"
-  top: "fc8_e1"
-  blobs_lr: 0.1
-  blobs_lr: 0.2
-  weight_decay: 1
-  weight_decay: 0
-  inner_product_param {
-    num_output: 441
-    weight_filler {
-      type: "gaussian"
-      std: 0.01
-    }
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
-  }
-}
-layers {
-  name: "fc8_e2"
+  top: "fc8"
+  name: "fc8"
   type: INNER_PRODUCT
-  bottom: "fc7"
-  top: "fc8_e2"
-  blobs_lr: 0.1
-  blobs_lr: 0.2
-  weight_decay: 1
-  weight_decay: 0
-  inner_product_param {
-    num_output: 441
-    weight_filler {
-      type: "gaussian"
-      std: 0.01
-    }
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
-  }
-}
-layers {
-  name: "fc8_e3"
-  type: INNER_PRODUCT
-  bottom: "fc7"
-  top: "fc8_e3"
-  blobs_lr: 0.1
-  blobs_lr: 0.2
-  weight_decay: 1
-  weight_decay: 0
-  inner_product_param {
-    num_output: 441
-    weight_filler {
-      type: "gaussian"
-      std: 0.01
-    }
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
-  }
-}
-layers {
-  name: "fc8_e1coarse"
-  type: INNER_PRODUCT
-  bottom: "fc7"
-  top: "fc8_e1coarse"
-  blobs_lr: 0.1
-  blobs_lr: 0.2
-  weight_decay: 1
-  weight_decay: 0
-  inner_product_param {
-    num_output: 147
-    weight_filler {
-      type: "gaussian"
-      std: 0.01
-    }
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
-  }
-}
-layers {
-  name: "fc8_e2coarse"
-  type: INNER_PRODUCT
-  bottom: "fc7"
-  top: "fc8_e2coarse"
-  blobs_lr: 0.1
-  blobs_lr: 0.2
-  weight_decay: 1
-  weight_decay: 0
-  inner_product_param {
-    num_output: 147
-    weight_filler {
-      type: "gaussian"
-      std: 0.01
-    }
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
-  }
-}
-layers {
-  name: "fc8_e3coarse"
-  type: INNER_PRODUCT
-  bottom: "fc7"
-  top: "fc8_e3coarse"
-  blobs_lr: 0.1
-  blobs_lr: 0.2
-  weight_decay: 1
-  weight_decay: 0
-  inner_product_param {
-    num_output: 147
-    weight_filler {
-      type: "gaussian"
-      std: 0.01
-    }
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
-  }
-}
-layers {
-  name: "pred_e1"
-  type: MASK_OUTPUTS
-  bottom: "fc8_e1"
-  bottom: "label"
-  top: "pred_e1"
-  mask_outputs_param {
-    kernel_size: 21
-  }
-}
-layers {
-  name: "pred_e2"
-  type: MASK_OUTPUTS
-  bottom: "fc8_e2"
-  bottom: "label"
-  top: "pred_e2"
-  mask_outputs_param {
-    kernel_size: 21
-  }
-}
-layers {
-  name: "pred_e3"
-  type: MASK_OUTPUTS
-  bottom: "fc8_e3"
-  bottom: "label"
-  top: "pred_e3"
-  mask_outputs_param {
-    kernel_size: 21
-  }
-}
-layers {
-  name: "pred_e1coarse"
-  type: MASK_OUTPUTS
-  bottom: "fc8_e1coarse"
-  bottom: "label"
-  top: "pred_e1coarse"
-  mask_outputs_param {
-    kernel_size: 7
-  }
-}
-layers {
-  name: "pred_e2coarse"
-  type: MASK_OUTPUTS
-  bottom: "fc8_e2coarse"
-  bottom: "label"
-  top: "pred_e2coarse"
-  mask_outputs_param {
-    kernel_size: 7
-  }
-}
-layers {
-  name: "pred_e3coarse"
-  type: MASK_OUTPUTS
-  bottom: "fc8_e3coarse"
-  bottom: "label"
-  top: "pred_e3coarse"
-  mask_outputs_param {
-    kernel_size: 7
-  }
-}
-layers {
-  name: "concat7"
-  type: CONCAT
-  bottom: "pred_e1"
-  bottom: "pred_e2"
-  bottom: "pred_e3"
-  bottom: "pred_e1coarse"
-  bottom: "pred_e2coarse"
-  bottom: "pred_e3coarse"
-  top: "concat7"
-  concat_param {
-    concat_dim: 1
+  inner_product_param{
+    num_output: 4
   }
 }
