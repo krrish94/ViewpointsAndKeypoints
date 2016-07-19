@@ -1,4 +1,5 @@
 prototxts/VGG_ILSVRC_16_layers.caffemodel
+prototxts/VGG_ILSVRC_19_layers.caffemodel
 snapshots/
 cachedir/
 data/

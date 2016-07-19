@@ -18,7 +18,7 @@ if shouldInitialize
     % Path to prototxt file of the deployment version of the net
     protoFile = fullfile(prototxtDir, proto, 'deploy.prototxt');
     % Name of the caffemodel file (excluding the '.caffemodel' suffix)
-    weightsFile = 'net_sgd_iter_65000';
+    weightsFile = 'net_iter_5000';
     % Path to the snapshot of the net weights (caffemodel file)
     binFile = fullfile(basedir, 'snapshots', proto, [weightsFile '.caffemodel']);
     
@@ -56,7 +56,7 @@ testLabels = encodePose(data.test.eulers, 'euler');
 numTest = length(data.test.voc_ids);
 
 % For each test instance
-for i = 1:100
+for i = 44 %1:100
     
     % Create a data struct required by the regressor
     curDataStruct.fileName = fullfile(pascalImagesDir, [data.test.voc_ids{i}, '.jpg']);
@@ -64,7 +64,7 @@ for i = 1:100
     curDataStruct.labels = single(pascalClassIndex('car'));
     
     % Run the network and obtain the predictions
-    preds = runNetOnce(cnn_model, curDataStruct);
+    preds = runRegressorOnce(cnn_model, curDataStruct)
     
     % Get the azimuth from the predictions
     pred_azimuth = atan2(preds(1), preds(2));
@@ -72,12 +72,14 @@ for i = 1:100
     
     % Get the ground-truth azimuth
     true_eulers = data.test.eulers(i,:);
-    true_azimuth = true_eulers(3)*180/pi
+    true_azimuth = true_eulers(3)*180/pi;
     
     % Compute error
     pred_error = abs(pred_azimuth - true_azimuth);
     if pred_error >= 360
         pred_error = pred_error - 360;
     end
+    
+    [pred_azimuth, true_azimuth];
     
 end

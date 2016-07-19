@@ -1,10 +1,14 @@
-# Base architecture is that of VGG-19
 name: "vggViewpointRegressor"
 input: "data"
 input_dim: 1
 input_dim: 3
 input_dim: 224
 input_dim: 224
+input: "label"
+input_dim: 1
+input_dim: 1
+input_dim: 1
+input_dim: 1
 layers {
   bottom: "data"
   top: "conv1_1"
@@ -148,23 +152,6 @@ layers {
 }
 layers {
   bottom: "conv3_3"
-  top: "conv3_4"
-  name: "conv3_4"
-  type: CONVOLUTION
-  convolution_param {
-    num_output: 256
-    pad: 1
-    kernel_size: 3
-  }
-}
-layers {
-  bottom: "conv3_4"
-  top: "conv3_4"
-  name: "relu3_4"
-  type: RELU
-}
-layers {
-  bottom: "conv3_4"
   top: "pool3"
   name: "pool3"
   type: POOLING
@@ -227,23 +214,6 @@ layers {
 }
 layers {
   bottom: "conv4_3"
-  top: "conv4_4"
-  name: "conv4_4"
-  type: CONVOLUTION
-  convolution_param {
-    num_output: 512
-    pad: 1
-    kernel_size: 3
-  }
-}
-layers {
-  bottom: "conv4_4"
-  top: "conv4_4"
-  name: "relu4_4"
-  type: RELU
-}
-layers {
-  bottom: "conv4_4"
   top: "pool4"
   name: "pool4"
   type: POOLING
@@ -306,23 +276,6 @@ layers {
 }
 layers {
   bottom: "conv5_3"
-  top: "conv5_4"
-  name: "conv5_4"
-  type: CONVOLUTION
-  convolution_param {
-    num_output: 512
-    pad: 1
-    kernel_size: 3
-  }
-}
-layers {
-  bottom: "conv5_4"
-  top: "conv5_4"
-  name: "relu5_4"
-  type: RELU
-}
-layers {
-  bottom: "conv5_4"
   top: "pool5"
   name: "pool5"
   type: POOLING
@@ -347,15 +300,15 @@ layers {
   name: "relu6"
   type: RELU
 }
-# layers {
-#   bottom: "fc6"
-#   top: "fc6"
-#   name: "drop6"
-#   type: DROPOUT
-#   dropout_param {
-#     dropout_ratio: 0.5
-#   }
-# }
+layers {
+  bottom: "fc6"
+  top: "fc6"
+  name: "drop6"
+  type: DROPOUT
+  dropout_param {
+    dropout_ratio: 0.5
+  }
+}
 layers {
   bottom: "fc6"
   top: "fc7"
@@ -371,21 +324,21 @@ layers {
   name: "relu7"
   type: RELU
 }
-# layers {
-#   bottom: "fc7"
-#   top: "fc7"
-#   name: "drop7"
-#   type: DROPOUT
-#   dropout_param {
-#     dropout_ratio: 0.5
-#   }
-# }
 layers {
   bottom: "fc7"
-  top: "fc8_mod"
-  name: "fc8_mod"
+  top: "fc7"
+  name: "drop7"
+  type: DROPOUT
+  dropout_param {
+    dropout_ratio: 0.5
+  }
+}
+layers {
+  bottom: "fc7"
+  top: "fc8"
+  name: "fc8"
   type: INNER_PRODUCT
-  inner_product_param {
+  inner_product_param{
     num_output: 4
   }
 }
