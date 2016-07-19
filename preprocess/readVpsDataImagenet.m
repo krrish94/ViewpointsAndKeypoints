@@ -1,4 +1,4 @@
-function [pos] = readDataImagenet(cls)
+function [pos] = readVpsDataImagenet(cls)
 %READDATAIMAGENET Summary of this function goes here
 %   Detailed explanation goes here
 %%
