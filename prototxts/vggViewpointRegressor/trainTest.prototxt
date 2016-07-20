@@ -2,6 +2,8 @@
 
 name: "vggViewpointRegressor"
 
+# Data layers
+
 # Data layers for train phase
 layer {
   name: "data"
@@ -21,6 +23,7 @@ layer {
     backend: LMDB
   }
 }
+
 layer {
   name: "label"
   type: "Data"
@@ -29,14 +32,13 @@ layer {
     phase: TRAIN
   }
   data_param {
-    source: "/home/km/code/ViewpointsAndKeypoints/cachedir/VNetTrainFiles/pascal_imagenet_train_lmdb_score"
+    source: "/home/km/code/ViewpointsAndKeypoints/cachedir/VNetTrainFiles/pascal_imagenet_train_lmdb_raw_labels"
     batch_size: 64
     backend: LMDB
   }
 }
 
 # Data layers for test phase
-# Data layers
 layer {
   name: "data"
   type: "Data"
@@ -63,13 +65,15 @@ layer {
     phase: TEST
   }
   data_param {
-    source: "/home/km/code/ViewpointsAndKeypoints/cachedir/VNetTrainFiles/pascal_imagenet_test_lmdb_score"
+    source: "/home/km/code/ViewpointsAndKeypoints/cachedir/VNetTrainFiles/pascal_imagenet_test_lmdb_raw_labels"
     batch_size: 1
     backend: LMDB
   }
 }
 
-# VGG-19 layers
+
+# Layers from VGG-19
+
 layer {
   bottom: "data"
   top: "conv1_1"
@@ -232,12 +236,6 @@ layer {
 
 layer {
   bottom: "conv3_4"
-  top: "conv3_4"
-  name: "relu3_4"
-  type: RELU
-}
-layers {
-  bottom: "conv3_4"
   top: "pool3"
   name: "pool3"
   type: "Pooling"
@@ -247,6 +245,7 @@ layers {
     stride: 2
   }
 }
+
 layer {
   bottom: "pool3"
   top: "conv4_1"
@@ -317,13 +316,7 @@ layer {
   type: "ReLU"
 }
 
-layers {
-  bottom: "conv4_4"
-  top: "conv4_4"
-  name: "relu4_4"
-  type: RELU
-}
-layers {
+layer {
   bottom: "conv4_4"
   top: "pool4"
   name: "pool4"
@@ -404,13 +397,7 @@ layer {
   type: "ReLU"
 }
 
-layers {
-  bottom: "conv5_4"
-  top: "conv5_4"
-  name: "relu5_4"
-  type: RELU
-}
-layers {
+layer {
   bottom: "conv5_4"
   top: "pool5"
   name: "pool5"
@@ -475,7 +462,7 @@ layer {
   name: "fc8_mod"
   type: "InnerProduct"
   inner_product_param {
-    num_output: 4
+    num_output: 1
   }
 }
 layer {

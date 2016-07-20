@@ -148,12 +148,13 @@ if __name__ == '__main__':
 		# outFile.write(str(testAngles[i]) + ' ' + str(testLabels[i]) + '\n')		
 		euclideanLoss = 0;
 		for j in range(2):
-			euclideanLoss += abs(predictedFeats[i][j] - trueFeats[i][j])
-		print euclideanLoss
+			euclideanLoss += (predictedFeats[i][j] - trueFeats[i][j])**2
+		print math.sqrt(euclideanLoss)	
 
 		# outFile.write(str(testAngles[i]) + ' ' + str(testLabels[i]) + ' ' + str(err) + '\n')
+
 
 	# print 'Average error: ', testError / len(testLabels), 'over', len(testLabels), 'samples'
 	# outFile.write('Average error: ' + str(testError/len(testLabels)) + ' over ' + str(len(testLabels)) + ' samples')
 
-	# outFile.close()	
+	# outFile.close()

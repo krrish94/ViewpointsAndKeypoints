@@ -386,6 +386,6 @@ layers {
   name: "fc8_mod"
   type: INNER_PRODUCT
   inner_product_param {
-    num_output: 4
+    num_output: 1
   }
 }

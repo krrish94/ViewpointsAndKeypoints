@@ -52,6 +52,8 @@ for i = 1:length(rotationData)
     end
 end
 
+fprintf('\n');
+
 % Create the train file
 disp('Generating CNN window file');
 
@@ -86,9 +88,9 @@ for j = 1:length(trainIndices)
     end
     
     % Write data to file
-    fprintf(fid, '%s %d %d %d %d %f %f %f %f \n', absPath, cur.bbox(1), ...
-        cur.bbox(2), cur.bbox(3), cur.bbox(4), sin(cur.euler(3)), ...
-        cos(cur.euler(3)), sin(cur.euler(1)), cos(cur.euler(1)));
+    fprintf(fid, '%s %d %d %d %d %f %f \n', absPath, cur.bbox(1), ...
+        cur.bbox(2), cur.bbox(3), cur.bbox(4), cur.euler(3)*180/pi, ...
+        cur.euler(1)*180/pi);
     
 end
 
