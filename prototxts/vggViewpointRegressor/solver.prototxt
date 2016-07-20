@@ -1,24 +1,19 @@
 net: "/home/km/code/ViewpointsAndKeypoints/prototxts/vggViewpointRegressor/trainTest.prototxt"
+
 test_iter: 10
-<<<<<<< HEAD
-test_interval: 100
-base_lr: 0.001
-=======
 test_interval: 1000
-base_lr: 1
-solver_type: SGD
->>>>>>> 4f212b64cdf63ed5270c73a521146437ee1c6e85
+
+base_lr: 0.001
 lr_policy: "step"
 gamma: 0.1
 stepsize: 20000
+
 display: 10
-<<<<<<< HEAD
 max_iter: 100000
-=======
-max_iter: 70000
->>>>>>> 4f212b64cdf63ed5270c73a521146437ee1c6e85
+
 momentum: 0.9
 weight_decay: 0.0005
+
 snapshot: 5000
 snapshot_prefix: "/home/km/code/ViewpointsAndKeypoints/snapshots/vggViewpointRegressor/net"
 

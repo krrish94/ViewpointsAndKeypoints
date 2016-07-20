@@ -34,7 +34,7 @@ if __name__ == '__main__':
 	lmdbDir = basedir + 'cachedir/VNetTrainFiles/'
 
 	# Load the network, defined in the prototxt file
-	net = caffe.Net(prototxtDir + 'deploy.prototxt', snapshotDir + 'net_iter_5000.caffemodel', caffe.TEST)
+	net = caffe.Net(prototxtDir + 'deploy.prototxt', snapshotDir + 'net_iter_20000.caffemodel', caffe.TEST)
 
 	# Print layer information
 	for key, val in net.blobs.items():
@@ -94,7 +94,6 @@ if __name__ == '__main__':
 		pred = out['fc8_mod']
 		# Compute the actual azimuth
 		azimuth = math.atan2(pred[0][0], pred[0][1])*180/math.pi
-		print i, azimuth
 
 		predictedAzimuths.append(azimuth)
 		predictedFeats.append([pred[0][0], pred[0][1]])
@@ -134,9 +133,7 @@ if __name__ == '__main__':
 		for d in data:
 			angle = math.atan2(d[0][0], d[1][0])*180/math.pi
 			trueFeats.append([d[0][0], d[1][0]])
-			print i, angle
 
-		print i, angle
 		trueAzimuths.append(angle)
 
 		i += 1
@@ -145,8 +142,6 @@ if __name__ == '__main__':
 
 	# Write data to text file
 	# outFile = open('net_predictions.txt', 'w')
-
-	print len(predictedAzimuths), len(trueAzimuths)
 
 	testError = 0.0
 	for i in range(len(trueAzimuths)):
