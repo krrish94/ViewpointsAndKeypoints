@@ -22,7 +22,7 @@ if __name__ == '__main__':
 	# Set the computation mode to GPU
 	caffe.set_mode_gpu()
 	# Select GPU with device ID 0 (On this machine, there's only this GPU)
-	caffe.set_device(0)
+	caffe.set_device(1)
 
 	# Root directory of the codebase
 	basedir = '/home/km/code/ViewpointsAndKeypoints/'
@@ -34,7 +34,7 @@ if __name__ == '__main__':
 	lmdbDir = basedir + 'cachedir/VNetTrainFiles/'
 
 	# Load the network, defined in the prototxt file
-	net = caffe.Net(prototxtDir + 'deploy.prototxt', snapshotDir + 'net_iter_20000.caffemodel', caffe.TEST)
+	net = caffe.Net(prototxtDir + 'deploy.prototxt', snapshotDir + 'net_iter_546.caffemodel', caffe.TEST)
 
 	# Print layer information
 	for key, val in net.blobs.items():
@@ -44,13 +44,13 @@ if __name__ == '__main__':
 	""" Load an image from the LMDB (test) database, and test the network """
 
 	# Open the LMDB (test) database
-	lmdb_env = lmdb.open(lmdbDir + 'pascal_imagenet_test_lmdb_data', readonly = True)
+	lmdb_env = lmdb.open(lmdbDir + 'pascal_imagenet_test_lmdb_raw_small_data', readonly = True)
 	lmdb_txn = lmdb_env.begin()
 	lmdb_cursor = lmdb_txn.cursor()
 	datum = caffe.proto.caffe_pb2.Datum()
 
 	predictedAzimuths = []
-	predictedFeats = []
+	# predictedFeats = []
 
 	i = 0
 
@@ -93,15 +93,17 @@ if __name__ == '__main__':
 		# Get the sin and cos of azimuth (and elevation) from the last FC layer
 		pred = out['fc8_mod']
 		# Compute the actual azimuth
-		azimuth = math.atan2(pred[0][0], pred[0][1])*180/math.pi
+		# azimuth = math.atan2(pred[0][0], pred[0][1])*180/math.pi
+		azimuth = pred[0][0]
 
 		predictedAzimuths.append(azimuth)
-		predictedFeats.append([pred[0][0], pred[0][1]])
+		# predictedFeats.append([pred[0][0], pred[0][1]])
 
-		# Included this break for now, as I want to test only on one image (for debugging the code)
+		# # Included this break for now, as I want to test only on one image (for debugging the code)
 		# break
 		i += 1
-		if i >= 10:
+		print i
+		if i >= 64:
 			break
 
 	# cv2.destroyAllWindows()
@@ -110,13 +112,13 @@ if __name__ == '__main__':
 	print 'Getting Ground Truth Labels ...'
 
 	# Open the LMDB (test scores) database
-	lmdb_env = lmdb.open(lmdbDir + 'pascal_imagenet_test_lmdb_score', readonly = True)
+	lmdb_env = lmdb.open(lmdbDir + 'pascal_imagenet_test_lmdb_raw_small_labels', readonly = True)
 	lmdb_txn = lmdb_env.begin()
 	lmdb_cursor = lmdb_txn.cursor()
 	datum = caffe.proto.caffe_pb2.Datum()
 
 	trueAzimuths = []
-	trueFeats = []
+	# trueFeats = []
 
 	i = 0
 
@@ -131,13 +133,14 @@ if __name__ == '__main__':
 		# print data.shape
 
 		for d in data:
-			angle = math.atan2(d[0][0], d[1][0])*180/math.pi
-			trueFeats.append([d[0][0], d[1][0]])
+			azimuth = d[0][0]
+			# angle = math.atan2(d[0][0], d[1][0])*180/math.pi
+			# trueFeats.append([d[0][0], d[1][0]])
 
-		trueAzimuths.append(angle)
+		trueAzimuths.append(azimuth)
 
 		i += 1
-		if i >= 10:
+		if i >= 64:
 			break
 
 	# Write data to text file
@@ -145,11 +148,14 @@ if __name__ == '__main__':
 
 	testError = 0.0
 	for i in range(len(trueAzimuths)):
-		# outFile.write(str(testAngles[i]) + ' ' + str(testLabels[i]) + '\n')		
+		# outFile.write(str(testAngles[i]) + ' ' + str(testLabels[i]) + '\n')
 		euclideanLoss = 0;
 		for j in range(2):
-			euclideanLoss += (predictedFeats[i][j] - trueFeats[i][j])**2
-		print math.sqrt(euclideanLoss)	
+			pass
+			# euclideanLoss += (predictedFeats[i][j] - trueFeats[i][j])**2
+		
+		euclideanLoss = abs(predictedAzimuths[i] - trueAzimuths[i])
+		print predictedAzimuths[i], trueAzimuths[i], euclideanLoss
 
 		# outFile.write(str(testAngles[i]) + ' ' + str(testLabels[i]) + ' ' + str(err) + '\n')
 

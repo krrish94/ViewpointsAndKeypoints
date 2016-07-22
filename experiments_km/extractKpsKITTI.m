@@ -19,7 +19,7 @@ addpath /home/km/code/ViewpointsAndKeypoints/data/KITTI/devkit_tracking/matlab/
 %% Parameters for KITTI (test data)
 
 % ID of the sequence to be processed
-sequenceNum = 1;
+sequenceNum = 4;
 
 % Mode ('manual', or 'auto'). Specifies if the user will input the bounding
 % box or if they have to be picked up from the ground truth.

@@ -18,7 +18,7 @@ layer {
     mean_value: 122.7717
   }
   data_param {
-    source: "/home/km/code/ViewpointsAndKeypoints/cachedir/VNetTrainFiles/pascal_imagenet_train_lmdb_data"
+    source: "/home/km/code/ViewpointsAndKeypoints/cachedir/VNetTrainFiles/pascal_imagenet_train_lmdb_raw_sorted_data"
     batch_size: 64
     backend: LMDB
   }
@@ -32,7 +32,7 @@ layer {
     phase: TRAIN
   }
   data_param {
-    source: "/home/km/code/ViewpointsAndKeypoints/cachedir/VNetTrainFiles/pascal_imagenet_train_lmdb_raw_labels"
+    source: "/home/km/code/ViewpointsAndKeypoints/cachedir/VNetTrainFiles/pascal_imagenet_train_lmdb_raw_classification_labels"
     batch_size: 64
     backend: LMDB
   }
@@ -65,7 +65,7 @@ layer {
     phase: TEST
   }
   data_param {
-    source: "/home/km/code/ViewpointsAndKeypoints/cachedir/VNetTrainFiles/pascal_imagenet_test_lmdb_raw_labels"
+    source: "/home/km/code/ViewpointsAndKeypoints/cachedir/VNetTrainFiles/pascal_imagenet_test_lmdb_raw_classification_labels"
     batch_size: 1
     backend: LMDB
   }
@@ -84,6 +84,12 @@ layer {
     pad: 1
     kernel_size: 3
   }
+  param{
+    lr_mult: 0
+  }
+  param{
+    lr_mult: 0
+  }
 }
 layer {
   bottom: "conv1_1"
@@ -100,6 +106,12 @@ layer {
     num_output: 64
     pad: 1
     kernel_size: 3
+  }
+  param{
+    lr_mult: 0
+  }
+  param{
+    lr_mult: 0
   }
 }
 layer {
@@ -129,6 +141,12 @@ layer {
     pad: 1
     kernel_size: 3
   }
+  param{
+    lr_mult: 0
+  }
+  param{
+    lr_mult: 0
+  }
 }
 layer {
   bottom: "conv2_1"
@@ -145,6 +163,12 @@ layer {
     num_output: 128
     pad: 1
     kernel_size: 3
+  }
+  param{
+    lr_mult: 0
+  }
+  param{
+    lr_mult: 0
   }
 }
 layer {
@@ -174,6 +198,12 @@ layer {
     pad: 1
     kernel_size: 3
   }
+  param{
+    lr_mult: 0
+  }
+  param{
+    lr_mult: 0
+  }
 }
 layer {
   bottom: "conv3_1"
@@ -190,6 +220,12 @@ layer {
     num_output: 256
     pad: 1
     kernel_size: 3
+  }
+  param{
+    lr_mult: 0
+  }
+  param{
+    lr_mult: 0
   }
 }
 layer {
@@ -208,6 +244,12 @@ layer {
     pad: 1
     kernel_size: 3
   }
+  param{
+    lr_mult: 0
+  }
+  param{
+    lr_mult: 0
+  }
 }
 layer {
   bottom: "conv3_3"
@@ -224,6 +266,12 @@ layer {
     num_output: 256
     pad: 1
     kernel_size: 3
+  }
+  param{
+    lr_mult: 0
+  }
+  param{
+    lr_mult: 0
   }
 }
 
@@ -256,6 +304,12 @@ layer {
     pad: 1
     kernel_size: 3
   }
+  param{
+    lr_mult: 0
+  }
+  param{
+    lr_mult: 0
+  }
 }
 layer {
   bottom: "conv4_1"
@@ -272,6 +326,12 @@ layer {
     num_output: 512
     pad: 1
     kernel_size: 3
+  }
+  param{
+    lr_mult: 0
+  }
+  param{
+    lr_mult: 0
   }
 }
 layer {
@@ -290,6 +350,12 @@ layer {
     pad: 1
     kernel_size: 3
   }
+  param{
+    lr_mult: 0
+  }
+  param{
+    lr_mult: 0
+  }
 }
 layer {
   bottom: "conv4_3"
@@ -306,6 +372,12 @@ layer {
     num_output: 512
     pad: 1
     kernel_size: 3
+  }
+  param{
+    lr_mult: 0
+  }
+  param{
+    lr_mult: 0
   }
 }
 
@@ -337,6 +409,12 @@ layer {
     pad: 1
     kernel_size: 3
   }
+  param{
+    lr_mult: 0
+  }
+  param{
+    lr_mult: 0
+  }
 }
 layer {
   bottom: "conv5_1"
@@ -353,6 +431,12 @@ layer {
     num_output: 512
     pad: 1
     kernel_size: 3
+  }
+  param{
+    lr_mult: 0
+  }
+  param{
+    lr_mult: 0
   }
 }
 layer {
@@ -371,6 +455,12 @@ layer {
     pad: 1
     kernel_size: 3
   }
+  param{
+    lr_mult: 0
+  }
+  param{
+    lr_mult: 0
+  }
 }
 layer {
   bottom: "conv5_3"
@@ -387,6 +477,12 @@ layer {
     num_output: 512
     pad: 1
     kernel_size: 3
+  }
+  param{
+    lr_mult: 0
+  }
+  param{
+    lr_mult: 0
   }
 }
 
@@ -462,13 +558,27 @@ layer {
   name: "fc8_mod"
   type: "InnerProduct"
   inner_product_param {
-    num_output: 1
+    num_output: 360
   }
 }
+# layer {
+#   bottom: "fc8_mod"
+#   bottom: "label"
+#   top: "loss"
+#   name: "loss"
+#   type: "EuclideanLoss"
+# }
 layer {
   bottom: "fc8_mod"
   bottom: "label"
   top: "loss"
   name: "loss"
-  type: "EuclideanLoss"
+  type: "SoftmaxWithLoss"
+}
+layer{
+  bottom: "fc8_mod"
+  bottom: "label"
+  top: "accuracy"
+  name: "accuracy"
+  type: "Accuracy"
 }
