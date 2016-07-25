@@ -18,10 +18,16 @@ if nargin == 0
     % Sequences to search through
     sequences = startSequence:endSequence;
 elseif nargin == 1
-    startSequence = 0;
-    endSequence = 10;
-    % Sequences to search through
+    
+    startSequence = 1;
+    endSequence = 1;
+    
+    % % Sequences to search through
     sequences = startSequence:endSequence;
+    
+    % Sequence 16 somehow doesn't work (maybe it's a pedestrian seq). So
+    % use this instead.
+    % sequences = [1:16, 18:20];
 end
 
 

@@ -16,7 +16,15 @@ addpath /home/km/code/ViewpointsAndKeypoints/data/KITTI/devkit_tracking/matlab/
 %% Parameters for KITTI (test data)
 
 % ID of the sequence to be processed
-sequenceNum = 4;
+% sequenceNum = 4;
+sequenceNum = shapeTestCaseParams.seqNum;
+
+% ID of the  image to process (in the sequence specified)
+% imageId = 0;
+imageId = shapeTestCaseParams.curFrameNum;
+% ID(s) of the car to track
+% carId = 0;
+carId = shapeTestCaseParams.curCarId;
 
 % Mode ('manual', or 'auto'). Specifies if the user will input the bounding
 % box or if they have to be picked up from the ground truth.
@@ -33,11 +41,6 @@ kittiCalibDir = fullfile(kittiBaseDir, 'calib');
 
 % Get number of images in the sequence
 numFrames = length(dir(fullfile(kittiImageDir)))-2;
-
-% ID of the  image to process (in the sequence specified)
-imageId = 0;
-% ID(s) of the car to track
-carId = 0;
 
 % Get calibration parameters
 % parameters: calib directory, sequence num, camera id (here, 2)
@@ -75,10 +78,10 @@ for j = 1:length(tracklet)
         continue
     end
     
-    % If we only have to track specific cars, perform a check if
+    % We only have to track specific cars. So, check if
     % the car id of the current tracklet is present in the list of
     % car ids to be tracked
-    if ~ismember(curTracklet.id, carId)
+    if curTracklet.id ~= carId;
         continue
     end
     
@@ -105,7 +108,7 @@ for j = 1:length(tracklet)
     curDataStruct.labels = single(pascalClassIndex(class));
     curDataStruct.carId = curTracklet.id;
     % Image number in the sequence
-    curDataStruct.imgNo = idx;
+    curDataStruct.imgNo = imageId;
     % Detection number in the image
     curDataStruct.detNo = j;
     
@@ -155,30 +158,37 @@ for j = 1:length(tracklet)
     
     %% Load Pascal 3D data structs (used in computing viewpoint priors)
     
+    % Set the name of the keypoint network
+    params.kpsNet = 'vgg';
+    
     % Load conv6 features (data struct, feat vector)
     
-    disp('Loading conv6');
-    load(fullfile(cachedir, 'rcnnPredsKps', [params.kpsNet 'Conv6Kps'], class));
-    % Flip the X and Y components of each heat map, and concatenate it back to
-    % a row vector
-    feat = flipMapXY(feat, [6 6]);
-    % Resize the heatmap to the dimensions specified by params.heatMapDims
-    feat6 = resizeHeatMap(feat, [6 6]);
-    % Compute a softmax over the feature vector
-    featConv6 = 1./(1+exp(-feat6));
+    if ~exist('featConv6', 'var')
+        disp('Loading conv6');
+        load(fullfile(cachedir, 'rcnnPredsKps', [params.kpsNet 'Conv6Kps'], class));
+        % Flip the X and Y components of each heat map, and concatenate it back to
+        % a row vector
+        feat = flipMapXY(feat, [6 6]);
+        % Resize the heatmap to the dimensions specified by params.heatMapDims
+        feat6 = resizeHeatMap(feat, [6 6]);
+        % Compute a softmax over the feature vector
+        featConv6 = 1./(1+exp(-feat6));
+    end
     
     
     % Load conv12 features
     
-    disp('Loading conv12');
-    load(fullfile(cachedir, 'rcnnPredsKps', [params.kpsNet 'Conv12Kps'], class));
-    % Flip the X and Y components of each heat map, and concatenate it back to
-    % a row vector
-    feat = flipMapXY(feat, [12 12]);
-    % Resize the heatmap to the dimesnions specified by params.heatMapDims
-    feat12 = resizeHeatMap(feat, [12 12]);
-    % Compute a softmax over the feature vector
-    featConv12 = 1./(1+exp(-feat12));
+    if ~exist('featConv12', 'var')
+        disp('Loading conv12');
+        load(fullfile(cachedir, 'rcnnPredsKps', [params.kpsNet 'Conv12Kps'], class));
+        % Flip the X and Y components of each heat map, and concatenate it back to
+        % a row vector
+        feat = flipMapXY(feat, [12 12]);
+        % Resize the heatmap to the dimesnions specified by params.heatMapDims
+        feat12 = resizeHeatMap(feat, [12 12]);
+        % Compute a softmax over the feature vector
+        featConv12 = 1./(1+exp(-feat12));
+    end
     
     
     %% Compute pose prior heatmaps for each detection
@@ -229,8 +239,14 @@ for j = 1:length(tracklet)
     featAll = 1./(1+exp(-conv6Feat-conv12Feat-log(posePriorFeat+eps)));
     
     
+    %% Compute likelihood maps
+    
+    disp('Computing likelihood maps');
+    likelihoodMaps = computeKpLikelihoodMaps(curDataStruct, featAll);
+    
+    
     %% Save the test case
-    save(sprintf('cachedir/shapeTestCases/seq%02d_frame%03d_car%03d', sequenceNum, imageId, carId), 'featVec', 'likelihoodMaps', 'curDataStruct', 'curTracklet', 'predictedYaw')
+    save(sprintf('cachedir/shapeTestCases/seq%02d_frame%03d_car%03d', sequenceNum, imageId, carId), 'featAll', 'likelihoodMaps', 'curDataStruct', 'curTracklet', 'predictedYaw')
     
     
 end
