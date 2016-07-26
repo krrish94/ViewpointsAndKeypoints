@@ -31,6 +31,10 @@ likelihoodMaps = zeros([size(im), params.numKps]);
 
 % For each keypoint
 for kpIdx = 1:params.numKps
+    
+    % To avoid indexing errors, wherever bbox is 0, make it 1. (Making this
+    % change after encountering such an error)
+    bbox(bbox == 0) = 1;
 
     % Scale the heatmap for the first keypoint to fit the bounding box. Size of
     % an image is specified in terms of height x width

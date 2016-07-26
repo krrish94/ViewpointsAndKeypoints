@@ -16,15 +16,15 @@ addpath /home/km/code/ViewpointsAndKeypoints/data/KITTI/devkit_tracking/matlab/
 %% Parameters for KITTI (test data)
 
 % ID of the sequence to be processed
-% sequenceNum = 4;
-sequenceNum = shapeTestCaseParams.seqNum;
+sequenceNum = 4;
+% sequenceNum = shapeTestCaseParams.seqNum;
 
 % ID of the  image to process (in the sequence specified)
-% imageId = 0;
-imageId = shapeTestCaseParams.curFrameNum;
+imageId = 0;
+% imageId = shapeTestCaseParams.curFrameNum;
 % ID(s) of the car to track
-% carId = 0;
-carId = shapeTestCaseParams.curCarId;
+carId = 0;
+% carId = shapeTestCaseParams.curCarId;
 
 % Mode ('manual', or 'auto'). Specifies if the user will input the bounding
 % box or if they have to be picked up from the ground truth.
