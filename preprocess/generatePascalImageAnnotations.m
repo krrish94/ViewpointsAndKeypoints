@@ -1,5 +1,5 @@
 function [] = generatePascalImageAnnotations()
-%GENERATEIMAGEANNOTATIONS Summary of this function goes here
+%GENERATEIMAGEANNOTATIONS  Summary of this function goes here
 %   Detailed explanation goes here
 
 % Declaring global variables

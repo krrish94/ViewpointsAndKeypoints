@@ -1,15 +1,18 @@
 function [] = mainKpsPreprocess()
-%MAINKPSPREPROCESS Summary of this function goes here
-%   Detailed explanation goes here
+% MAINKPSPREPROCESS  Performs all preprocessing required to train the
+% keypoint prediction network.
 
+
+% Declaring global variables
 globals;
-%% imgwise annotations
+
+% Generate annotations over Pascal3D. Store them in annotationDir.
 generatePascalImageAnnotations();
 
-%% rcnn data files
+% Generate RCNN data files (currently only for the 'car' class)
 rcnnKpsDataCollect();
 
-%% generate partName labels
+% Generate 'partName' labels
 mkdirOptional(fullfile(cachedir,'partNames'));
 for c = params.classInds
     class = pascalIndexClass(c);
@@ -18,13 +21,13 @@ for c = params.classInds
     save(fullfile(cachedir,'partNames',class),'partNames');
 end
 
-%% generate window file
+% Generate window file for Conv6Kps
 params.heatMapDims = [6 6];
 pascalKpsMulticlassTrainValCreate()
-% 
+% Generate window file for Conv12Kps
 params.heatMapDims = [12 12];
 pascalKpsMulticlassTrainValCreate()
 
-%% train the cnns
+% Train the cnns (not in MATLAB, unfortunately!)
 
 end

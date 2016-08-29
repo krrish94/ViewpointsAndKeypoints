@@ -10,7 +10,8 @@ warning('off', 'all');
 globals;
 
 % Add KITTI's Matlab code directory to path (the visualization one)
-addpath /home/km/code/ViewpointsAndKeypoints/data/KITTI/devkit_tracking/matlab/
+% addpath /home/km/code/ViewpointsAndKeypoints/data/KITTI/devkit_tracking/matlab/
+addpath /home/data/datasets/km/KITTI/devkit_tracking/matlab/
 
 
 %% Parameters for KITTI (test data)
@@ -31,7 +32,8 @@ carId = 0;
 bboxMode = 'auto';
 
 % Base directory (containing KITTI data)
-kittiBaseDir = fullfile(basedir, 'data', 'KITTI');
+% kittiBaseDir = fullfile(basedir, 'data', 'KITTI');`
+kittiBaseDir = '/home/data/datasets/km/KITTI/';
 % Root directory containing KITTI images (for training sequences)
 kittiImageDir = fullfile(kittiBaseDir, sprintf('image_02/%04d', sequenceNum));
 % Directory containing KITTI labels (for training sequences)

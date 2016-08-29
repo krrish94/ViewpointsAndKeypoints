@@ -2,6 +2,7 @@ function [] = rcnnKpsDataCollect()
 %RCNNDATA Summary of this function goes here
 %   Detailed explanation goes here
 
+
 % Declare global variables
 globals;
 
@@ -14,7 +15,7 @@ delete(fullfile(rcnnDataDir,'*.mat'));
 candidateThresh = params.candidateThresh;
 annotationDir = annotationDir;
 
-%% WINDOW FILE FORMAT
+% WINDOW FILE FORMAT
 % repeated :
 %   img_path(abs)
 %   reg2sp file path
@@ -25,11 +26,12 @@ annotationDir = annotationDir;
 %   num_windows
 %   classIndex overlap x1 y1 x2 y2 regionIndex poseParam0 .. poseParam(numPoseParam)
 
-%% Iterate over classes
+
+% Iterate over classes
 fnames = getFileNamesFromDirectory(annotationDir,'types',{'.mat'});
 for i=1:length(fnames)
 %for i=randperm(length(fnames))
-    i
+    % i
     if(~mod(i,1000))
         disp(i)
     end

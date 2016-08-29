@@ -15,13 +15,15 @@ cachedir  = fullfile(basedir,'cachedir');
 
 
 % Root directory containing the Pascal3D dataset
-PASCAL3Ddir = fullfile(basedir,'data','PASCAL3D');
+% PASCAL3Ddir = fullfile(basedir,'data','PASCAL3D');
+PASCAL3Ddir = '/home/data/datasets/PASCAL3D';
 % Base directory of Pascal VOC's development kit
-pascalDir = '/home/km/code/ViewpointsAndKeypoints/data/PASCAL3D/PASCAL/VOCdevkit/';
+pascalDir = '/home/data/datasets/PASCAL3D/PASCAL/VOCdevkit/';
 % Directory containing Pascal (VOC) images
-pascalImagesDir = '/home/km/code/ViewpointsAndKeypoints/data/PASCAL3D/PASCAL/VOCdevkit/VOC2012/JPEGImages';
+pascalImagesDir = '/home/data/datasets/PASCAL3D/PASCAL/VOCdevkit/VOC2012/JPEGImages';
 % Directory containing Imagenet images
-imagenetImagesDir = fullfile(basedir,'data','imagenet','images');
+% imagenetImagesDir = fullfile(basedir,'data','imagenet','images');
+imagenetImagesDir = '/home/data/datasets/imagenet/images';
 
 % File containing RCNN detections on the validation set for Pascal
 rcnnDetectionsFile = fullfile(basedir,'data','VOC2012_val_det.mat');
