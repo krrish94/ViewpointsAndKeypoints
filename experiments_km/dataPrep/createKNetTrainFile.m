@@ -16,78 +16,135 @@ classInd = 7;
 % Load the train/val split for pascal
 load(fullfile(cachedir,'pascalTrainValIds.mat'));
 
-% Dimensions of the heatmap to be used for multi-scale response fusion
-dims = params.heatMapDims;
-% Threshold on the heatmap (???)
-probThresh = params.heatMapThresh;
+% Seed RNG, for repeatability
+rng(1234);
+
+% Number of keypoints possible in an image
+numKps = length(keypoints.labels);
+
+% Part name for each keypoint
+partNames = keypoints.labels;
+
+% % Dimensions of the heatmap to be used for multi-scale response fusion
+% dims = params.heatMapDims;
+% % Threshold on the heatmap (???)
+% probThresh = params.heatMapThresh;
 
 % Iterate over each keypoint annotation
 numSamples = length(keypoints.voc_image_id);
-txtFile = fullfile(finetuneKpsDir, 'KNetTrainFile.txt');
-fid = fopen(txtFile, 'w+');
-temp = [];
-count = 0;
-for i = 1:numSamples
-    % Load the image
-    img = imread(fullfile(pascalImagesDir, [keypoints.voc_image_id{i}, '.jpg']));
-    % Get the bounding box corresponding to the left wheel center (the
-    % first keypoint)
-    curKeypoint = squeeze(keypoints.coords(i,:,:));
-    leftWheel = curKeypoint(1,:);
-    % Reject samples that have NaN for the left wheel
-    if isnan(leftWheel(1)) || isnan(leftWheel(2))
-        continue
-    end
-    % Load the 'cands' struct for the current detection. It contains more
-    % information on occlusion, difficulty, etc.
-    cands = load(fullfile(rcnnKpsPascalDataDir, keypoints.voc_image_id{i}));
-    % if sum(cands.difficult) > 30
-    %     continue
-    % end
-    % Get all 'good' indices, i.e., indices that contain cars, and that are
-    % not occluded, truncated, or difficult
-    goodInds = ismember(cands.boxClass, classInd);
-    goodInds = goodInds & ~cands.difficult;
-    
-    % Sample a 32-by-32 window around the keypoint
-    x1 = leftWheel(1) - 15;
-    x2 = leftWheel(1) + 16;
-    y1 = leftWheel(2) - 15;
-    y2 = leftWheel(2) + 16;
-    % Ensure that the window does not go outside the image
-    outsideFlag = false;
-    imsize = size(img);
-    if x1 < 0
-        x1 = 0;
-        outsideFlag = true;
-    end
-    if y1 < 0 
-        y1 = 0;
-        outsideFlag = true;
-    end
-    if x2 > imsize(2)
-        x1 = imsize(2);
-        outsideFlag = true;
-    end
-    if y2 > imsize(1)
-        y2 = imsize(1);
-        outsideFlag = true;
-    end
-    % Resize the final image to 32-by-32
-    % imgNew = imresize(img, [32, 32]);
-    if outsideFlag
-        continue
+writeFiles = true;
+
+for kpIdx = 1:numKps
+    % String containing the current keypoint partname
+    curName = partNames(kpIdx);
+    curName = curName{1};
+    if writeFiles
+        % Delete old files
+        delete([basedir, '/cachedir/KNetTrainFiles/', curName, '/*']);
+        delete(fullfile(basedir, '/cachedir/KNetTrainFiles/', curName, '.txt'));
+        delete(fullfile(basedir, '/cachedir/KNetTrainFiles/', curName, '32LMDB.txt'));
+        % Create directory to store images
+        mkdir([basedir, '/cachedir/KNetTrainFiles/', curName]);
+        % Text file used by the CNN to regress to heatmaps
+        txtFile = fullfile(basedir, '/cachedir/KNetTrainFiles/', [curName, '.txt']);
+        fid = fopen(txtFile, 'w+');
+        % Text file used to create LMDB
+        txtFileLMDB = fullfile(basedir, '/cachedir/KNetTrainFiles/', [curName, '32LMDB.txt']);
+        fidLMDB = fopen(txtFileLMDB, 'w+');
     end
     
-    imgNew = img(y1:y2, x1:x2, :);
-    
-    if size(imgNew,1) == 32 && size(imgNew,2) == 32
-        count = count + 1;
+    temp = [];
+    count = 0;
+    for i = 1:numSamples
+        fprintf('%d -> %d/%d\n', kpIdx, i, numSamples);
+        % Load the image
+        img = imread(fullfile(pascalImagesDir, [keypoints.voc_image_id{i}, '.jpg']));
+        % Get the bounding box corresponding to the left wheel center (the
+        % first keypoint)
+        curKeypoint = squeeze(keypoints.coords(i,:,:));
+        kpOfInterest = curKeypoint(kpIdx,:);
+        % Reject samples that have NaN for the left wheel
+        if isnan(kpOfInterest(1)) || isnan(kpOfInterest(2))
+            continue
+        end
+        % Load the 'cands' struct for the current detection. It contains more
+        % information on occlusion, difficulty, etc.
+        cands = load(fullfile(rcnnKpsPascalDataDir, keypoints.voc_image_id{i}));
+        % if sum(cands.difficult) > 30
+        %     continue
+        % end
+        % Get all 'good' indices, i.e., indices that contain cars, and that are
+        % not occluded, truncated, or difficult
+        goodInds = ismember(cands.boxClass, classInd);
+        goodInds = goodInds & ~cands.difficult & ~cands.occluded & ~cands.truncated;
+        if sum(goodInds) < 50
+            continue
+        end
+        
+        % Reject small bounding boxes
+        if keypoints.bbox(i,3) < 50 || keypoints.bbox(i,4) < 50
+            continue
+        end
+        
+        % Number of patches to sample from the current image
+        numPatches = 32;
+        
+        for k = 1:numPatches
+            % Sample a 32-by-32 window around the keypoint (randomly)
+            randX = randint(1,1,[0,15]);
+            randY = randint(1,1,[0,15]);
+            x1 = kpOfInterest(1) - randX;
+            x2 = x1 + 31;
+            y1 = kpOfInterest(2) - randY;
+            y2 = y1 + 31;
+            % Ensure that the window does not go outside the image
+            outsideFlag = false;
+            imsize = size(img);
+            if x1 < 0
+                x1 = 0;
+                outsideFlag = true;
+            end
+            if y1 < 0
+                y1 = 0;
+                outsideFlag = true;
+            end
+            if x2 > imsize(2)
+                x1 = imsize(2);
+                outsideFlag = true;
+            end
+            if y2 > imsize(1)
+                y2 = imsize(1);
+                outsideFlag = true;
+            end
+            % Resize the final image to 32-by-32
+            % imgNew = imresize(img, [32, 32]);
+            if outsideFlag
+                continue
+            end
+            
+            if randX == 0 || randY == 0
+                continue
+            end
+            
+            imgNew = img(y1:y2, x1:x2, :);
+            
+            if size(imgNew,1) == 32 && size(imgNew,2) == 32
+                count = count + 1;
+                % imshow(imgNew);
+                % hold on;
+                % scatter(randX, randY, 'filled');
+                % pause;
+            end
+            
+            if writeFiles
+                imgLocation = [basedir, '/cachedir/KNetTrainFiles/', curName, '/', [keypoints.voc_image_id{i} '_' num2str(k)], '.jpg'];
+                imwrite(imgNew, imgLocation, 'jpg');
+                fprintf(fid, '%s %f,%f 0,0,0,0,0 0\n', imgLocation, randX, randY);
+                fprintf(fidLMDB, '%s %f %f\n', imgLocation, randX, randY);
+            end
+        end
+        
     end
-    
-    imgLocation = [basedir, 'cachedir/KNetTrainFiles/train32/', keypoints.voc_image_id{i}];
-    imwrite(img, imgLocation, 'jpg');
-    fprintf(fid, '%s %f,%f 0,0,0,0,0 0\n', imgLocation, 
     
 end
 
