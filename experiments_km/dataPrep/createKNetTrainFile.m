@@ -32,9 +32,9 @@ partNames = keypoints.labels;
 
 % Iterate over each keypoint annotation
 numSamples = length(keypoints.voc_image_id);
-writeFiles = true;
+writeFiles = false;
 
-for kpIdx = 1:numKps
+for kpIdx = 13
     % String containing the current keypoint partname
     curName = partNames(kpIdx);
     curName = curName{1};
@@ -55,7 +55,7 @@ for kpIdx = 1:numKps
     
     temp = [];
     count = 0;
-    for i = 1:numSamples
+    for i = 1:30
         fprintf('%d -> %d/%d\n', kpIdx, i, numSamples);
         % Load the image
         img = imread(fullfile(pascalImagesDir, [keypoints.voc_image_id{i}, '.jpg']));
@@ -89,7 +89,7 @@ for kpIdx = 1:numKps
         % Number of patches to sample from the current image
         numPatches = 32;
         
-        for k = 1:numPatches
+        for k = 1
             % Sample a 32-by-32 window around the keypoint (randomly)
             randX = randint(1,1,[0,15]);
             randY = randint(1,1,[0,15]);
@@ -130,10 +130,10 @@ for kpIdx = 1:numKps
             
             if size(imgNew,1) == 32 && size(imgNew,2) == 32
                 count = count + 1;
-                % imshow(imgNew);
-                % hold on;
-                % scatter(randX, randY, 'filled');
-                % pause;
+                imshow(imgNew);
+                hold on;
+                scatter(randX, randY, 'filled');
+                pause;
             end
             
             if writeFiles
