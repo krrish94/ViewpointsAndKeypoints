@@ -28,7 +28,8 @@ aps = zeros(numel(priorAlphas,20));
 for c = params.classInds
     class = pascalIndexClass(c);
     annot = getKeypointannotationStruct(class,valIds);
-    preds = computePredictionStruct(class,(unique(annot.img_name)),priorAlphas,'All');
+    % preds = computePredictionStruct(class,(unique(annot.img_name)),priorAlphas,'All');
+    preds = computePredictionStruct(class,(unique(annot.img_name)),priorAlphas,'');
     for d = 1:numel(priorAlphas)
         aps(d,c) = compute_kp_APK(annot,preds{d},0.2);
     end

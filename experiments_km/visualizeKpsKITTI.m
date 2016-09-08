@@ -124,12 +124,77 @@ for idx = 1:length(kpDetections)
         
         [kpCoords,scores] = maxLocationPredict(testFeat, bbox, params.heatMapDims);
         kpCoords = kpCoords(1:2, 1:14);
-        [b, bi] = sort(scores, 'descend');
-        [~, ind] = find(scores >= 0.4);
-        kpCoords = kpCoords(1:2, ind);
+        % Uncomment the following line if you only want to retain some
+        % 'confident' keypoints
+%         [b, bi] = sort(scores, 'descend');
+%         [~, ind] = find(scores >= 0.4);
+%         kpCoords = kpCoords(1:2, ind);
         
         bbox2(1) = bbox(1); bbox2(2) = bbox(2); bbox2(3) = bbox(3)-bbox(1); bbox2(4) = bbox(4)-bbox(2);
-        scatter(kpCoords(1,:),kpCoords(2,:),50,'r','filled')
+        
+        % Use this if you only want to see the keypoints (scatter plot)
+        % scatter(kpCoords(1,:),kpCoords(2,:),50,'r','filled')
+        
+        
+        % Use this if you want to see overlaid wireframes
+        numKps = size(kpCoords, 2);
+        % Generate distinguishable colors with respect to a white background
+        colors = distinguishable_colors(numKps, [0, 0, 0]);
+        % First, plot the keypoints (vertices of the wireframe)
+        wireframe = double(kpCoords);
+        scatter(wireframe(1,:), wireframe(2,:), repmat(20, 1, numKps), colors, 'filled');
+        % Plot text labels for car keypoints, using distinguishable colors
+        text(wireframe(1,1), wireframe(2,1), 'L\_F\_WheelCenter', 'color', colors(1,:), 'FontSize', 10, 'BackgroundColor', [0, 0, 0]);
+        text(wireframe(1,2), wireframe(2,2), 'R\_F\_WheelCenter', 'color', colors(2,:), 'FontSize', 10, 'BackgroundColor', [0, 0, 0]);
+        text(wireframe(1,3), wireframe(2,3), 'L\_B\_WheelCenter', 'color', colors(3,:), 'FontSize', 10, 'BackgroundColor', [0, 0, 0]);
+        text(wireframe(1,4), wireframe(2,4), 'R\_B\_WheelCenter', 'color', colors(4,:), 'FontSize', 10, 'BackgroundColor', [0, 0, 0]);
+        text(wireframe(1,5), wireframe(2,5), 'L\_HeadLight', 'color', colors(5,:), 'FontSize', 10, 'BackgroundColor', [0, 0, 0]);
+        text(wireframe(1,6), wireframe(2,6), 'R\_HeadLight', 'color', colors(6,:), 'FontSize', 10, 'BackgroundColor', [0, 0, 0]);
+        text(wireframe(1,7), wireframe(2,7), 'L\_TailLight', 'color', colors(7,:), 'FontSize', 10, 'BackgroundColor', [0, 0, 0]);
+        text(wireframe(1,8), wireframe(2,8), 'R\_TailLight', 'color', colors(8,:), 'FontSize', 10, 'BackgroundColor', [0, 0, 0]);
+        text(wireframe(1,9), wireframe(2,9), 'L\_SideViewMirror', 'color', colors(9,:), 'FontSize', 10, 'BackgroundColor', [0, 0, 0]);
+        text(wireframe(1,10), wireframe(2,10), 'R\_SideViewMirror', 'color', colors(10,:), 'FontSize', 10, 'BackgroundColor', [0, 0, 0]);
+        text(wireframe(1,11), wireframe(2,11), 'L\_F\_RoofTop', 'color', colors(11,:), 'FontSize', 10, 'BackgroundColor', [0, 0, 0]);
+        text(wireframe(1,12), wireframe(2,12), 'R\_F\_RoofTop', 'color', colors(12,:), 'FontSize', 10, 'BackgroundColor', [0, 0, 0]);
+        text(wireframe(1,13), wireframe(2,13), 'L\_B\_RoofTop', 'color', colors(13,:), 'FontSize', 10, 'BackgroundColor', [0, 0, 0]);
+        text(wireframe(1,14), wireframe(2,14), 'R\_B\_RoofTop', 'color', colors(14,:), 'FontSize', 10, 'BackgroundColor', [0, 0, 0]);
+        % L_F_RoofTop -> R_F_RoofTop -> R_B_RoofTop -> L_B_RoofTop
+        edges = [11, 12; 12, 14; 14, 13; 13, 11;];
+        % L_HeadLight -> R_HeadLight -> R_TailLight -> L_TailLight
+        edges = [edges; 5, 6; 6, 8; 8, 7; 7, 5];
+        % L_Headlight -> L_F_RoofTop
+        edges = [edges; 5, 11];
+        % R_HeadLight -> R_F_RoofTop
+        edges = [edges; 6, 12];
+        % L_TailLight -> L_B_RoofTop
+        edges = [edges; 7, 13];
+        % R_TailLight -> R_B_RoofTop
+        edges = [edges; 8, 14];
+        % L_F_WheelCenter -> R_F_WheelCenter -> R_B_WheelCenter -> L_B_WheelCenter
+        edges = [edges; 1, 2; 2, 4; 4, 3; 3, 1];
+        % L_HeadLight -> L_F_WheelCenter
+        edges = [edges; 5, 1];
+        % R_HeadLight -> R_F_WheelCenter
+        edges = [edges; 6, 2];
+        % L_TailLight -> L_B_WheelCenter
+        edges = [edges; 7, 3];
+        % R_TailLight -> R_B_WheelCenter
+        edges = [edges; 8, 4];
+        % L_SideViewMirror -> L_HeadLight
+        edges = [edges; 9, 5];
+        % R_SideViewMirror -> R_HeadLight
+        edges = [edges; 10, 6];
+        % Generate distinguishable colors (equal to the number of edges). The
+        % second parameter to the function is the background color.
+        colors = distinguishable_colors(size(edges,1), [1, 1, 1]);
+        
+        % Draw each edge in the plot
+        for i = 1:size(edges, 1)
+            plot(wireframe(1,[edges(i,1), edges(i,2)]), wireframe(2, [edges(i,1), edges(i,2)]), ...
+                'LineWidth', 2, 'Color', colors(i,:));
+        end
+        
+        
         rectangle('Position', bbox2, 'LineWidth', 3, 'EdgeColor', 'g');
         
     end

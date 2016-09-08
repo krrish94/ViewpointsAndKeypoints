@@ -15,7 +15,10 @@ for imgIdx = 1:200
             kpCoords = kpCoords(1:2, 1:14);
             [b, bi] = sort(scores, 'descend');
             [~, ind] = find(scores >= 0.99);
-            kpCoords = kpCoords(1:2, ind);
+            
+            % Uncomment the following only if you want 'confident' kps to
+            % appear on the plot
+%             kpCoords = kpCoords(1:2, ind);
             
         case 'maxLocationCandidates'
             % disp('maxLocationCandidates method');
@@ -27,17 +30,21 @@ for imgIdx = 1:200
             scores = scoresTemp;
             % kpCoords = kpCoords(1:2, 1:14);
             % kpCoords = kpCoords{1:14};
-            kpCoordsTemp = [];
-            for idx = 1:length(kpCoords)
-                kpCoordsTemp = [kpCoordsTemp, kpCoords{idx}];
-            end
-            kpCoords = kpCoordsTemp;
+
+            % Uncomment the following only if you want 'confident' kps to
+            % appear on the plot
+%             kpCoordsTemp = [];
+%             for idx = 1:length(kpCoords)
+%                 kpCoordsTemp = [kpCoordsTemp, kpCoords{idx}];
+%             end
+%             kpCoords = kpCoordsTemp;
     end
     
     bbox2(1) = bbox(1); bbox2(2) = bbox(2); bbox2(3) = bbox(3)-bbox(1); bbox2(4) = bbox(4)-bbox(2);
     imshow(im);
     hold on
-    scatter(kpCoords(1,:),kpCoords(2,:),50,'r','filled')
+    % scatter(kpCoords(1,:),kpCoords(2,:),50,'r','filled')
+    visualizeWireframe2D(im, kpCoords);
     % scatter(kps(:,1),kps(:,2),50,'b','filled')
     rectangle('Position', bbox2, 'LineWidth', 3, 'EdgeColor', 'g');
     hold off

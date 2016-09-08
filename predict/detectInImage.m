@@ -17,7 +17,8 @@ for d=1:length(responseDims)
     bbox = var.dataStructsImg(cInd).bbox;
 end
 
-varPose = load(fullfile(cachedir,'rcnnImgDetectionPredsVps','vggJointVpsMirror',imname));
+% varPose = load(fullfile(cachedir,'rcnnImgDetectionPredsVps','vggJointVpsMirror',imname));
+varPose = load(fullfile(cachedir,'rcnnImgDetectionPredsVps','vggConv6Kps',imname));
 goodInds = varPose.labels==cInd;
 poseFeat = varPose.feat(goodInds,:);
 

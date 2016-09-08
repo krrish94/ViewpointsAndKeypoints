@@ -13,20 +13,22 @@ globals;
 % initViewpointNet;
 
 % Add KITTI's Matlab code directory to path (the visualization one)
-addpath /home/km/code/ViewpointsAndKeypoints/data/KITTI/devkit_tracking/matlab/
+% addpath /home/km/code/ViewpointsAndKeypoints/data/KITTI/devkit_tracking/matlab/
+addpath /home/data/datasets/km/KITTI/devkit_tracking/matlab/
 
 
 %% Parameters for KITTI (test data)
 
 % ID of the sequence to be processed
-sequenceNum = 4;
+sequenceNum = 1;
 
 % Mode ('manual', or 'auto'). Specifies if the user will input the bounding
 % box or if they have to be picked up from the ground truth.
 bboxMode = 'auto';
 
 % Base directory (containing KITTI data)
-kittiBaseDir = fullfile(basedir, 'data', 'KITTI');
+% kittiBaseDir = fullfile(basedir, 'data', 'KITTI');
+kittiBaseDir = '/home/data/datasets/km/KITTI';
 % Root directory containing KITTI images (for training sequences)
 kittiImageDir = fullfile(kittiBaseDir, sprintf('image_02/%04d', sequenceNum));
 % Directory containing KITTI labels (for training sequences)
@@ -40,7 +42,7 @@ numFrames = length(dir(fullfile(kittiImageDir)))-2;
 % ID of the first image to process (in the sequence specified)
 startImageId = 0;
 % ID of the last image to process (in the sequence specified)
-endImageId = 0;
+endImageId = 100;
 % endImageId = numFrames-1;
 % Creating a list of images to process
 imageList = startImageId:endImageId;
@@ -216,6 +218,9 @@ end
 
 
 %% Load Pascal 3D data structs (used in computing viewpoint priors)
+
+% Set params.kpsNet to 'vgg', since we used VGGNet to extract keypoints
+params.kpsNet = 'vgg';
 
 % Load conv6 features (data struct, feat vector)
 

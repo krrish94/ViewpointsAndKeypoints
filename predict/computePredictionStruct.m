@@ -23,6 +23,7 @@ for i=1:length(fnames)
         disp(i)
     end
         
+    % dets = detectInImage(fnames{i},class,priorAlpha,suffix,ones(size(mapDims)));
     dets = detectInImage(fnames{i},class,priorAlpha,suffix,ones(size(mapDims)));
     
     for d = 1:numel(priorAlpha)

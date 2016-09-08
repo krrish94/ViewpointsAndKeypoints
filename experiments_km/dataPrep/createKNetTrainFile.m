@@ -32,9 +32,9 @@ partNames = keypoints.labels;
 
 % Iterate over each keypoint annotation
 numSamples = length(keypoints.voc_image_id);
-writeFiles = false;
+writeFiles = true;
 
-for kpIdx = 13
+for kpIdx = 1:numKps
     % String containing the current keypoint partname
     curName = partNames(kpIdx);
     curName = curName{1};
@@ -55,7 +55,7 @@ for kpIdx = 13
     
     temp = [];
     count = 0;
-    for i = 1:30
+    for i = 1:numSamples
         fprintf('%d -> %d/%d\n', kpIdx, i, numSamples);
         % Load the image
         img = imread(fullfile(pascalImagesDir, [keypoints.voc_image_id{i}, '.jpg']));
@@ -89,7 +89,7 @@ for kpIdx = 13
         % Number of patches to sample from the current image
         numPatches = 32;
         
-        for k = 1
+        for k = 1:numPatches
             % Sample a 32-by-32 window around the keypoint (randomly)
             randX = randint(1,1,[0,15]);
             randY = randint(1,1,[0,15]);
@@ -130,16 +130,16 @@ for kpIdx = 13
             
             if size(imgNew,1) == 32 && size(imgNew,2) == 32
                 count = count + 1;
-                imshow(imgNew);
-                hold on;
-                scatter(randX, randY, 'filled');
-                pause;
+                % imshow(imgNew);
+                % hold on;
+                % scatter(randX, randY, 'filled');
+                % pause;
             end
             
             if writeFiles
                 imgLocation = [basedir, '/cachedir/KNetTrainFiles/', curName, '/', [keypoints.voc_image_id{i} '_' num2str(k)], '.jpg'];
                 imwrite(imgNew, imgLocation, 'jpg');
-                fprintf(fid, '%s %f,%f 0,0,0,0,0 0\n', imgLocation, randX, randY);
+                fprintf(fid, '%s %f,%f\n', imgLocation, randX, randY);
                 fprintf(fidLMDB, '%s %f %f\n', imgLocation, randX, randY);
             end
         end

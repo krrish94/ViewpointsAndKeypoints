@@ -2,7 +2,7 @@
 
 
 % Path to the directory in which images are contained
-dirToBeAnnotated = '/home/km/datasets/cityscapes-train-temp';
+dirToBeAnnotated = '/home/km/datasets/cityscapes-train';
 
 % Path where annotations are to be stored
 dirToStoreAnnotations = '/home/km/datasets/cityscapes-kps';
@@ -14,11 +14,11 @@ numKps = 14;
 fileList = dir(dirToBeAnnotated);
 
 % Initialize a figure for the GUI
-guiFig = figure;
+% guiFig = figure;
 
 % Load the first figure into the GUI
-img = imread(fullfile(dirToBeAnnotated, fileList(3).name));
-imshow(img);
+% img = imread(fullfile(dirToBeAnnotated, fileList(3).name));
+% imshow(img);
 
 % Get the size of the image
 imSize = size(img);
@@ -27,7 +27,7 @@ imSize = size(img);
 % axis([0, imSize(2), -200, imSize(1)]);
 
 % Set plot title
-title('CityScapes Annotator');
+% title('CityScapes Annotator');
 
 % % Write instruction text
 % topText = 'left arrow: previous image; right arrow: next image; Esc: exit';
@@ -37,7 +37,10 @@ title('CityScapes Annotator');
 
 % Ignore the first two entries of fileList, since they correspond to . and
 % .. repectively.
-for i = 3:length(fileList)
+for i = 3:5
+    
+    % Initialize a figure for the GUI
+    guiFig = figure;
     
     % Read in and display the image
     img = imread(fullfile(dirToBeAnnotated, fileList(i).name));
@@ -123,12 +126,12 @@ for i = 3:length(fileList)
             case 's'
                 lastSavedObjectID = lastSavedObjectID + 1;
                 annot.objID = lastSavedObjectID;
-                save(fullfile(dirToStoreAnnotations, [saveFileName, num2str(annot.objID)]), 'annot');
+                save(fullfile(dirToStoreAnnotations, [saveFileName, '_', num2str(annot.objID)]), 'annot');
                 continue;
             case 'd'
                 lastSavedObjectID = lastSavedObjectID + 1;
                 annot.objID = lastSavedObjectID;
-                save(fullfile(dirToStoreAnnotations, [saveFileName, num2str(annot.objID)]), 'annot');
+                save(fullfile(dirToStoreAnnotations, [saveFileName, '_', num2str(annot.objID)]), 'annot');
                 break;
         end
     end
