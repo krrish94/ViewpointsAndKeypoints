@@ -34,6 +34,7 @@ partNames = keypoints.labels;
 numSamples = length(keypoints.voc_image_id);
 writeFiles = true;
 
+
 for kpIdx = 1:numKps
     % String containing the current keypoint partname
     curName = partNames(kpIdx);
@@ -42,15 +43,15 @@ for kpIdx = 1:numKps
         % Delete old files
         delete([basedir, '/cachedir/KNetTrainFiles/', curName, '/*']);
         delete(fullfile(basedir, '/cachedir/KNetTrainFiles/', curName, '.txt'));
-        delete(fullfile(basedir, '/cachedir/KNetTrainFiles/', curName, '32LMDB.txt'));
+        % delete(fullfile(basedir, '/cachedir/KNetTrainFiles/', curName, '32LMDB.txt'));
         % Create directory to store images
         mkdir([basedir, '/cachedir/KNetTrainFiles/', curName]);
         % Text file used by the CNN to regress to heatmaps
         txtFile = fullfile(basedir, '/cachedir/KNetTrainFiles/', [curName, '.txt']);
         fid = fopen(txtFile, 'w+');
-        % Text file used to create LMDB
-        txtFileLMDB = fullfile(basedir, '/cachedir/KNetTrainFiles/', [curName, '32LMDB.txt']);
-        fidLMDB = fopen(txtFileLMDB, 'w+');
+        % % Text file used to create LMDB
+        % txtFileLMDB = fullfile(basedir, '/cachedir/KNetTrainFiles/', [curName, '32LMDB.txt']);
+        % fidLMDB = fopen(txtFileLMDB, 'w+');
     end
     
     temp = [];
@@ -91,12 +92,14 @@ for kpIdx = 1:numKps
         
         for k = 1:numPatches
             % Sample a 32-by-32 window around the keypoint (randomly)
-            randX = randint(1,1,[0,15]);
-            randY = randint(1,1,[0,15]);
-            x1 = kpOfInterest(1) - randX;
-            x2 = x1 + 31;
-            y1 = kpOfInterest(2) - randY;
-            y2 = y1 + 31;
+            randX = randint(1,1,[-15,15]);
+            randY = randint(1,1,[-15,15]);
+            t_x = kpOfInterest(1) - 16 + randX;
+            t_y = kpOfInterest(2) - 16 + randY;
+            b_x = t_x + 31;
+            b_y = t_y + 31;
+            
+            x1 = t_x; x2 = b_x; y1 = t_y; y2 = b_y;
             % Ensure that the window does not go outside the image
             outsideFlag = false;
             imsize = size(img);
@@ -132,15 +135,15 @@ for kpIdx = 1:numKps
                 count = count + 1;
                 % imshow(imgNew);
                 % hold on;
-                % scatter(randX, randY, 'filled');
+                % scatter(16-randX, 16-randY, 'filled');
                 % pause;
             end
             
             if writeFiles
                 imgLocation = [basedir, '/cachedir/KNetTrainFiles/', curName, '/', [keypoints.voc_image_id{i} '_' num2str(k)], '.jpg'];
                 imwrite(imgNew, imgLocation, 'jpg');
-                fprintf(fid, '%s %f,%f\n', imgLocation, randX, randY);
-                fprintf(fidLMDB, '%s %f %f\n', imgLocation, randX, randY);
+                fprintf(fid, '%s %f,%f\n', imgLocation, 16-randX, 16-randY);
+                % fprintf(fidLMDB, '%s %f %f\n', imgLocation, randX, randY);
             end
         end
         
